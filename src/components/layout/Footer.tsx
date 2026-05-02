@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, ArrowRight } from 'lucide-react';
 import { Facebook, Twitter, Instagram, Youtube } from '../common/SocialIcons';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -89,45 +89,52 @@ const Footer = () => {
 
       <style>{`
         .footer {
-          background: var(--bg-offset);
-          border-top: 1px solid var(--marble);
+          background: #4b0000;
+          border-top: 3px solid var(--accent);
+          border-image: linear-gradient(to right, transparent, var(--accent), var(--sacred-gold), var(--accent), transparent) 1;
           margin-top: 4rem;
+          position: relative;
+          color: white;
         }
 
         .footer-grid {
           display: grid;
           grid-template-columns: 1.2fr 0.8fr 0.8fr 1.2fr;
           gap: 4rem;
+          text-align: center; /* Center all text globally */
         }
 
         .f-logo {
           display: flex;
           align-items: center;
+          justify-content: center; /* Center logo */
           gap: 0.8rem;
-          color: var(--secondary);
+          color: var(--accent);
           margin-bottom: 1.5rem;
+          text-decoration: none;
         }
 
         .f-desc {
-          color: var(--text-muted);
-          margin-bottom: 2rem;
+          color: rgba(255, 255, 255, 0.8);
+          margin: 0 auto 2rem; /* Center description block */
           max-width: 300px;
         }
 
         .social-links {
           display: flex;
+          justify-content: center; /* Center social icons */
           gap: 1rem;
         }
 
         .social-btn {
           width: 40px;
           height: 40px;
-          background: var(--marble);
+          background: rgba(255,255,255,0.1);
           display: flex;
           align-items: center;
           justify-content: center;
           border-radius: 50%;
-          color: var(--text);
+          color: white;
           transition: var(--transition);
         }
 
@@ -138,38 +145,54 @@ const Footer = () => {
         }
 
         .footer-links h4, .footer-newsletter h4 {
-          font-family: var(--font-main);
-          font-size: 1.1rem;
-          font-weight: 700;
-          margin-bottom: 2rem;
-          color: var(--text);
+          font-family: var(--font-heading);
+          font-size: 1.3rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          color: var(--accent);
+          letter-spacing: 0.5px;
+          text-align: center; /* Explicitly center headings */
+        }
+        
+        .footer-newsletter p {
+          text-align: center;
+          color: rgba(255, 255, 255, 0.8);
+          margin-bottom: 1rem;
         }
 
         .footer-links ul {
           list-style: none;
+          padding: 0;
         }
 
         .footer-links li {
-          margin-bottom: 0.75rem;
+          margin-bottom: 0.8rem;
         }
 
         .footer-links a {
-          color: var(--text-muted);
+          color: rgba(255, 255, 255, 0.8);
           font-size: 0.95rem;
+          text-decoration: none;
+          transition: var(--transition);
+          display: inline-block;
         }
 
         .footer-links a:hover {
           color: var(--primary);
-          padding-left: 5px;
+          transform: translateY(-2px); /* Switched from padding-left to vertical lift for centered layout */
         }
 
         .newsletter-form {
           display: flex;
-          background: white;
-          padding: 0.5rem;
+          background: rgba(255,255,255,0.05);
+          padding: 0.4rem;
           border-radius: 50px;
-          border: 1px solid var(--marble);
+          border: 1px solid rgba(255,255,255,0.1);
           margin-bottom: 2rem;
+          margin-top: 1rem;
+          max-width: 300px;
+          margin-left: auto;
+          margin-right: auto; /* Center the form input */
         }
 
         .newsletter-form input {
@@ -178,6 +201,12 @@ const Footer = () => {
           padding: 0 1rem;
           outline: none;
           background: transparent;
+          color: white;
+          text-align: center; /* Center input placeholder text */
+        }
+        
+        .newsletter-form input::placeholder {
+          color: rgba(255,255,255,0.5);
         }
 
         .newsletter-form button {
@@ -190,39 +219,50 @@ const Footer = () => {
           align-items: center;
           justify-content: center;
           transition: var(--transition);
+          border: none;
+          cursor: pointer;
         }
 
         .newsletter-form button:hover {
-          background: var(--secondary);
+          background: var(--primary-hover);
         }
 
         .contact-info {
           display: flex;
           flex-direction: column;
           gap: 1rem;
+          align-items: center; /* Center contact list */
         }
 
         .info-item {
           display: flex;
           align-items: center;
-          gap: 1rem;
-          color: var(--text-muted);
-          font-size: 0.9rem;
+          justify-content: center; /* Center icon + text */
+          gap: 0.75rem;
+          color: rgba(255, 255, 255, 0.8);
+          font-size: 0.95rem;
         }
 
         .footer-bottom {
-          padding: 2rem 0;
-          border-top: 1px solid var(--marble);
-          color: var(--text-muted);
+          padding: 1.5rem 0;
+          border-top: 1px solid rgba(255,255,255,0.1);
+          color: rgba(255, 255, 255, 0.6);
           font-size: 0.9rem;
+          background: rgba(0,0,0,0.2);
         }
 
         .bottom-content {
           display: flex;
-          justify-content: space-between;
+          flex-direction: column; /* Stack bottom content */
+          justify-content: center;
           align-items: center;
+          gap: 1rem;
+          text-align: center;
         }
 
+        /* Responsive Breakpoints */
+        
+        /* Tablet Landscape & Small Laptop */
         @media (max-width: 1024px) {
           .footer-grid {
             grid-template-columns: 1fr 1fr;
@@ -230,15 +270,41 @@ const Footer = () => {
           }
         }
 
+        /* Tablet Portrait */
+        @media (max-width: 768px) {
+          .footer-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+          }
+        }
+
+        /* Mobile */
         @media (max-width: 600px) {
           .footer-grid {
             grid-template-columns: 1fr;
+            gap: 2.5rem;
           }
           .bottom-content {
             flex-direction: column;
             gap: 1rem;
             text-align: center;
           }
+          .footer-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+          }
+          .social-links {
+            justify-content: center;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .footer-top { padding: 2.5rem 0 !important; }
+          .social-btn { width: 44px; height: 44px; }
+          .newsletter-form { max-width: 100%; }
+          .footer-links h4, .footer-newsletter h4 { font-size: 1.1rem; }
         }
       `}</style>
     </footer>

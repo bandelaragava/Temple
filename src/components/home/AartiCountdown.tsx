@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Bell, CheckCircle } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const AartiCountdown = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState({ h: 0, m: 0, s: 0 });
   const [isReminderSet, setIsReminderSet] = useState(false);
   const [nextAartiTime, setNextAartiTime] = useState('--:--');
@@ -39,7 +39,7 @@ const AartiCountdown = () => {
 
       setNextAartiTime(selectedTimeStr);
       const diff = nextAarti.getTime() - now.getTime();
-      
+
       if (diff > 0) {
         setTimeLeft({
           h: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -85,7 +85,7 @@ const AartiCountdown = () => {
           <small>{timeLeft.s === 1 ? t('label_sec') : t('label_secs')}</small>
         </div>
       </div>
-      <button 
+      <button
         className={`btn-primary reminder-btn ${isReminderSet ? 'active' : ''}`}
         onClick={() => setIsReminderSet(!isReminderSet)}
       >
@@ -107,15 +107,17 @@ const AartiCountdown = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 2rem 3rem;
-          margin-top: -80px;
+          padding: 2.5rem 3rem;
+          margin-top: -3rem;
+          margin-bottom: 0.5rem;
           position: relative;
           z-index: 10;
-          background: rgba(255, 255, 255, 0.9);
-          backdrop-filter: blur(10px);
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(15px);
           color: var(--text);
           border: 1px solid var(--glass-border);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+          box-shadow: var(--shadow);
+          border-radius: 20px;
         }
 
         .next-label {
@@ -194,9 +196,19 @@ const AartiCountdown = () => {
             flex-direction: column;
             gap: 2rem;
             text-align: center;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
             margin-top: 0;
           }
+          .timer { gap: 0.75rem; }
+        }
+
+        @media (max-width: 480px) {
+          .timer { gap: 0.5rem; }
+          .timer-segment span { font-size: 1.6rem; }
+          .timer-segment { min-width: 35px; }
+          .timer-sep { font-size: 1.5rem; padding-bottom: 0.8rem; }
+          .reminder-btn { width: 100%; min-width: unset; }
+          .aarti-countdown h3 { font-size: 1.1rem; }
         }
       `}</style>
     </div>

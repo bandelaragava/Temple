@@ -2,42 +2,74 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Check, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const Language = () => {
   const navigate = useNavigate();
-  const { language: selected, setLanguage, t } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const language = i18n.language;
+  const setLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+
+    // Set cookies for persistence
+    const cookieValue = lang === 'en' ? '' : `/en/${lang}`;
+    const cookieExpiry = lang === 'en' ? 'Thu, 01 Jan 1970 00:00:00 UTC' : 'Fri, 31 Dec 9999 23:59:59 GMT';
+
+    document.cookie = `googtrans=${cookieValue}; expires=${cookieExpiry}; path=/;`;
+    document.cookie = `googtrans=${cookieValue}; expires=${cookieExpiry}; domain=${window.location.hostname}; path=/;`;
+
+    // Trigger Google Translate dropdown programmatically
+    const applyToWidget = (targetLang: string) => {
+      const select = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+      if (select) {
+        select.value = targetLang;
+        select.dispatchEvent(new Event('change'));
+        return true;
+      }
+      return false;
+    };
+
+    if (!applyToWidget(lang)) {
+      // If select isn't found immediately, wait a bit and try again
+      let retries = 0;
+      const interval = setInterval(() => {
+        if (applyToWidget(lang) || retries > 10) {
+          clearInterval(interval);
+        }
+        retries++;
+      }, 200);
+    }
+  };
 
   const languages = [
-    { id: 'en', tKey: 'lang_en', native: t('lang_native_en'), region: t('region_global') },
-    { id: 'te', tKey: 'lang_te', native: t('lang_native_te'), region: t('region_telugu') },
-    { id: 'ta', tKey: 'lang_ta', native: t('lang_native_ta'), region: t('region_tamil') },
-    { id: 'kn', tKey: 'lang_kn', native: t('lang_native_kn'), region: t('region_kannada') },
-    { id: 'hi', tKey: 'lang_hi', native: t('lang_native_hi'), region: t('region_hindi') },
-    { id: 'sa', tKey: 'lang_sa', native: t('lang_native_sa'), region: t('region_spiritual') },
+    { id: 'en', tKey: 'lang_en', native: 'English', region: 'Global' },
+    { id: 'te', tKey: 'lang_te', native: 'తెలుగు', region: 'Andhra Pradesh / Telangana' },
+    { id: 'ta', tKey: 'lang_ta', native: 'தமிழ்', region: 'Tamil Nadu' },
+    { id: 'kn', tKey: 'lang_kn', native: 'ಕನ್ನಡ', region: 'Karnataka' },
+    { id: 'hi', tKey: 'lang_hi', native: 'हिन्दी', region: 'North India' },
+    { id: 'sa', tKey: 'lang_sa', native: 'संस्कृतम्', region: 'Vedic' },
   ] as const;
 
   const handleSelect = (id: typeof languages[number]['id']) => {
     setLanguage(id);
-    const selectedLang = languages.find(l => l.id === id);
+    // Smooth transition back to home
     setTimeout(() => {
-      alert(`${t('alert_lang_updated')} ${selectedLang?.native}.`);
       navigate('/');
-    }, 300);
+    }, 500);
   };
 
   return (
     <div className="language-page section-padding" style={{ paddingTop: '150px' }}>
       <div className="container">
         <div className="header-center">
-          <motion.span 
+          <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="subtitle"
           >
             {t('divine_portal')}
           </motion.span>
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -54,7 +86,7 @@ const Language = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.05 }}
-              className={`lang-card glass-card ${selected === lang.id ? 'selected' : ''}`}
+              className={`lang-card glass-card ${language === lang.id ? 'selected' : ''}`}
               onClick={() => handleSelect(lang.id)}
             >
               <div className="lang-main">
@@ -62,7 +94,7 @@ const Language = () => {
                   <span className="native">{lang.native}</span>
                   <span className="name">{t(lang.tKey)}</span>
                 </div>
-                {selected === lang.id && (
+                {language === lang.id && (
                   <div className="check-icon">
                     <Check size={16} />
                   </div>
@@ -80,6 +112,7 @@ const Language = () => {
       <style>{`
         .header-center {
           text-align: center;
+          margin-top: -60px;
           margin-bottom: 3.5rem;
         }
 
@@ -199,6 +232,25 @@ const Language = () => {
         .lang-card:hover .arrow {
           opacity: 1;
           transform: translateX(0);
+        }
+
+        @media (max-width: 768px) {
+          .languages-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+          .header-center {
+            margin-top: -20px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .languages-grid {
+            grid-template-columns: 1fr;
+          }
+          .header-center {
+            margin-top: 0;
+          }
+          .lang-card { padding: 1.25rem; }
         }
       `}</style>
     </div>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Bell, Users, MapPin } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const Festivals = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const mainFestivals = [
     {
       title: t('fest_brahmotsavam'),
@@ -88,7 +88,7 @@ const Festivals = () => {
 
       <style>{`
         .festivals-page {
-          margin-top: 100px;
+          margin-top: 30px;
         }
 
         .festivals-grid {
@@ -146,7 +146,7 @@ const Festivals = () => {
         }
 
         .fest-content h3 {
-          font-size: 1.5rem;
+          font-size: clamp(1.2rem, 3vw, 1.5rem);
           margin: 0.75rem 0 1rem;
           color: var(--secondary);
         }
@@ -201,6 +201,14 @@ const Festivals = () => {
         @media (max-width: 900px) {
           .festivals-grid { grid-template-columns: 1fr; }
           .info-flex { flex-direction: column; text-align: center; }
+          .info-flex .btn-secondary { width: 100%; }
+        }
+
+        @media (max-width: 600px) {
+          .fest-img { height: 220px; }
+          .fest-content { padding: 1.5rem; }
+          .page-header h1 { font-size: 2rem; }
+          .location-info { padding: 1.5rem; }
         }
       `}</style>
     </div>

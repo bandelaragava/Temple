@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, Camera } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { Camera } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Gallery = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [filter, setFilter] = useState('all');
 
-  const galleryItems = [
-    { title: "Rajagopuram at Sunset", category: "architecture", img: "/assets/hero_temple.png" },
-    { title: "Celestial Bathing Ritual", category: "rituals", img: "/assets/temple_rituals.png" },
-    { title: "Sanctum Interiors", category: "deity", img: "/assets/main_govindaraja.png" },
-    { title: "Visesha Diparadhana", category: "rituals", img: "/assets/live_darshan.png" },
-    { title: "Intricate Stone Carvings", category: "architecture", img: "/assets/saint.png" },
-    { title: "Govinda Pushkarini", category: "festivals", img: "/assets/live_darshan.png" },
-    { title: "Pundarikavalli Shriyai", category: "deity", img: "/assets/deity.png" },
-    { title: "Processional Chariot", category: "festivals", img: "/assets/hero_temple.png" }
-  ];
+  const [galleryItems] = useState(() => {
+    const saved = localStorage.getItem('galleryImages');
+    return saved ? JSON.parse(saved).map((img: any) => ({ ...img, category: 'all', img: img.url })) : [
+      { title: "Rajagopuram at Sunset", category: "architecture", img: "/assets/hero_temple.png" },
+      { title: "Celestial Bathing Ritual", category: "rituals", img: "/assets/temple_rituals.png" },
+      { title: "Sanctum Interiors", category: "deity", img: "/assets/main_govindaraja.png" },
+      { title: "Visesha Diparadhana", category: "rituals", img: "/assets/live_darshan.png" },
+      { title: "Intricate Stone Carvings", category: "architecture", img: "/assets/saint.png" },
+      { title: "Govinda Pushkarini", category: "festivals", img: "/assets/live_darshan.png" },
+      { title: "Pundarikavalli Shriyai", category: "deity", img: "/assets/deity.png" },
+      { title: "Processional Chariot", category: "festivals", img: "/assets/hero_temple.png" }
+    ];
+  });
 
-  const filteredItems = filter === 'all' 
-    ? galleryItems 
-    : galleryItems.filter(item => item.category === filter);
+  const filteredItems = filter === 'all'
+    ? galleryItems
+    : galleryItems.filter((item: any) => item.category === filter);
 
   const getCategoryLabel = (cat: string) => {
     const labels: Record<string, string> = {
@@ -45,7 +48,7 @@ const Gallery = () => {
         <div className="gallery-controls">
           <div className="filter-group">
             {['all', 'architecture', 'deity', 'rituals', 'festivals'].map(cat => (
-              <button 
+              <button
                 key={cat}
                 className={`filter-btn ${filter === cat ? 'active' : ''}`}
                 onClick={() => setFilter(cat)}
@@ -61,8 +64,8 @@ const Gallery = () => {
 
         <motion.div layout className="masonry-grid">
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item, i) => (
-              <motion.div 
+            {filteredItems.map((item: any) => (
+              <motion.div
                 key={item.title}
                 layout
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -85,7 +88,7 @@ const Gallery = () => {
       </div>
 
       <style>{`
-        .gallery-page { margin-top: 100px; }
+        .gallery-page { margin-top: 30px; }
 
         .gallery-controls {
           display: flex;
@@ -181,8 +184,21 @@ const Gallery = () => {
         .gallery-card:hover .card-overlay { opacity: 1; }
 
         @media (max-width: 900px) {
-          .gallery-controls { flex-direction: column; border-radius: 20px; gap: 1.5rem; }
+          .gallery-controls { flex-direction: column; border-radius: 20px; gap: 1.5rem; padding: 1.5rem; }
           .filter-group { flex-wrap: wrap; justify-content: center; }
+          .masonry-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 600px) {
+          .masonry-grid { grid-template-columns: 1fr; }
+          .filter-btn { padding: 0.6rem 1rem; font-size: 0.8rem; }
+          .gallery-controls { padding: 1.2rem; gap: 1rem; }
+          .card-media { height: 260px; }
+        }
+
+        @media (max-width: 400px) {
+          .gallery-stats { display: none; }
+          .filter-btn { padding: 0.5rem 0.8rem; font-size: 0.75rem; }
         }
       `}</style>
     </div>

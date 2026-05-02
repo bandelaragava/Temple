@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Sun, Moon, Star, Bell, Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const Almanac = () => {
-  const { t, locale } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language || 'en';
   const [selectedDate, setSelectedDate] = useState(new Date());
   const dateInputRef = useRef<HTMLInputElement>(null);
 
@@ -41,11 +42,15 @@ const Almanac = () => {
   const getPanchangamData = (date: Date) => {
     const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
     
+    const isToday = new Date().toDateString() === date.toDateString();
+    const cmsData = isToday ? localStorage.getItem('panchangam') : null;
+    const parsed = cmsData ? JSON.parse(cmsData) : null;
+
     return [
-      { label: t('label_tithi'), value: t(`tithi_${dayOfYear % 30}`), icon: <Moon size={18} /> },
-      { label: t('label_nakshatram'), value: t(`nakshatra_${dayOfYear % 27}`), icon: <Star size={18} /> },
-      { label: t('label_yogam'), value: t(`yogam_${dayOfYear % 27}`), icon: <Sun size={18} /> },
-      { label: t('label_karanam'), value: t(`karanam_${dayOfYear % 11}`), icon: <Bell size={18} /> },
+      { label: t('label_tithi'), value: parsed?.tithi || t(`tithi_${dayOfYear % 30}`), icon: <Moon size={18} /> },
+      { label: t('label_nakshatram'), value: parsed?.nakshatram || t(`nakshatra_${dayOfYear % 27}`), icon: <Star size={18} /> },
+      { label: t('label_yogam'), value: parsed?.yogam || t(`yogam_${dayOfYear % 27}`), icon: <Sun size={18} /> },
+      { label: t('label_karanam'), value: parsed?.karanam || t(`karanam_${dayOfYear % 11}`), icon: <Bell size={18} /> },
     ];
   };
 
@@ -58,15 +63,20 @@ const Almanac = () => {
     const sunriseTimes = ['06:40 AM', '06:30 AM', '06:15 AM', '06:05 AM', '05:55 AM', '05:50 AM', '05:55 AM', '06:05 AM', '06:15 AM', '06:20 AM', '06:30 AM', '06:40 AM'];
     const sunsetTimes = ['06:00 PM', '06:15 PM', '06:30 PM', '06:45 PM', '07:00 PM', '07:10 PM', '07:05 PM', '06:50 PM', '06:30 PM', '06:10 PM', '05:55 PM', '05:50 PM'];
 
+    const isToday = new Date().toDateString() === date.toDateString();
+    const cmsData = isToday ? localStorage.getItem('panchangam') : null;
+    const parsed = cmsData ? JSON.parse(cmsData) : null;
+
     return [
-      { label: t('label_sunrise'), value: sunriseTimes[month] },
-      { label: t('label_sunset'), value: sunsetTimes[month] },
-      { label: t('label_rahu'), value: rahu[day] },
-      { label: t('label_gulika'), value: gulika[day] },
+      { label: t('label_sunrise'), value: parsed?.sunrise || sunriseTimes[month] },
+      { label: t('label_sunset'), value: parsed?.sunset || sunsetTimes[month] },
+      { label: t('label_rahu'), value: parsed?.rahu || rahu[day] },
+      { label: t('label_gulika'), value: parsed?.gulika || gulika[day] },
     ];
   };
 
-  const allFestivals = [
+  const cmsFestivals = localStorage.getItem('upcomingFestivals');
+  const allFestivals = cmsFestivals ? JSON.parse(cmsFestivals) : [
     { date: '2026-04-14', name: t('fest_tamil_new_year') },
     { date: '2026-04-23', name: t('fest_hanuman_jayanti') },
     { date: '2026-04-26', name: t('fest_ekadashi') },
@@ -213,9 +223,9 @@ const Almanac = () => {
 
         .almanac-grid {
           display: grid;
-          grid-template-columns: 400px 1fr;
-          gap: 4rem;
-          align-items: center;
+          grid-template-columns: minmax(300px, 400px) 1fr;
+          gap: 3rem;
+          align-items: start;
         }
 
         .almanac-main {
@@ -372,7 +382,7 @@ const Almanac = () => {
         }
 
         .details-header h2 {
-          font-size: 2.5rem;
+          font-size: clamp(1.5rem, 3.5vw, 2.5rem);
           margin-top: 1rem;
         }
 
@@ -406,7 +416,7 @@ const Almanac = () => {
 
         .festivals-card {
           padding: 2rem;
-          background: white;
+          background: var(--bg);
           border: 1px solid rgba(0,0,0,0.05);
         }
 
@@ -444,12 +454,24 @@ const Almanac = () => {
         }
 
         @media (max-width: 992px) {
-          .almanac-grid {
-            grid-template-columns: 1fr;
-          }
-          .almanac-main {
-            width: 100%;
-          }
+          .almanac-grid { grid-template-columns: 1fr; gap: 2rem; }
+          .almanac-main { width: 100%; padding: 2.5rem; }
+        }
+
+        @media (max-width: 768px) {
+          .almanac-header { flex-direction: column; gap: 1rem; text-align: center; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1.5rem; }
+          .panchangam-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+          .timings-grid { grid-template-columns: 1fr; gap: 1rem; }
+        }
+
+        @media (max-width: 480px) {
+          .panchangam-list { grid-template-columns: 1fr; }
+          .day-num { font-size: 3rem; }
+          .month-year { font-size: 0.75rem; }
+          .day-name { font-size: 1.2rem; display: block !important; }
+          .almanac-main { padding: 1.5rem; }
+          .festivals-card { padding: 1.25rem; }
+          .fest-item { flex-direction: column; gap: 0.25rem; }
         }
       `}</style>
     </section>

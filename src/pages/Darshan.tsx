@@ -1,10 +1,16 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock, Info, Shield, Calendar } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const Darshan = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
+  
+  const [darshanInfo, setDarshanInfo] = React.useState(() => {
+    const saved = localStorage.getItem('darshanInfo');
+    return saved ? JSON.parse(saved) : 'Sarva Darshan is available from 08:30 AM to 11:30 PM. Special entry darshan requires prior booking.';
+  });
+
   const darshanTimings = [
     { type: t('seva_suprabhata'), time: '05:00 AM - 05:30 AM', entry: 'Paid Seva', tEntry: t('entry_paid') || 'Paid Seva', desc: t('seva_suprabhata_desc') },
     { type: t('seva_viswaroopa') || 'Viswaroopa Darshanam', time: '05:30 AM - 06:30 AM', entry: 'Free', tEntry: t('entry_free') || 'Free', desc: t('seva_viswaroopa_desc') || 'The first public darshan of the day.' },
@@ -54,6 +60,11 @@ const Darshan = () => {
 
         <div className="info-grid mt-4">
           <div className="info-card glass-card">
+            <Info className="icon-p" />
+            <h4>Live Updates</h4>
+            <p>{darshanInfo}</p>
+          </div>
+          <div className="info-card glass-card">
             <Shield className="icon-p" />
             <h4>{t('info_dress_code')}</h4>
             <p>{t('info_dress_desc')}</p>
@@ -73,7 +84,7 @@ const Darshan = () => {
 
       <style>{`
         .darshan-page {
-          margin-top: 100px;
+          margin-top: 30px;
           min-height: 80vh;
         }
 
@@ -149,12 +160,12 @@ const Darshan = () => {
 
         .info-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 2rem;
         }
 
         .info-card {
-          padding: 2.5rem;
+          padding: 2rem;
           text-align: center;
         }
 
@@ -179,6 +190,26 @@ const Darshan = () => {
           }
           .hide-mobile { display: none; }
           .info-grid { grid-template-columns: 1fr; }
+          .page-header h1 { font-size: 2.8rem; }
+        }
+
+        @media (max-width: 600px) {
+          .timings-table-header { display: none; }
+          .timing-row {
+            grid-template-columns: 1fr;
+            gap: 0.8rem;
+            padding: 1.5rem;
+            text-align: center;
+          }
+          .col.time { justify-content: center; }
+          .entry-pill { width: 100%; max-width: 150px; }
+          .page-header h1 { font-size: 2.2rem; }
+          .info-card { padding: 2rem 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+          .page-header h1 { font-size: 1.8rem; }
+          .timing-row { border-bottom: 8px solid var(--bg-offset); }
         }
       `}</style>
     </div>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const FloatingActions = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {

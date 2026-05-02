@@ -1,370 +1,777 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, Bookmark, MapPin, Phone, Mail, Landmark, Sparkles, BookOpen, Clock, Heart } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import {
+  History,
+  Target,
+  Map as MapIcon,
+  Layout,
+  Heart,
+  Info,
+  Phone,
+  Mail,
+  ChevronRight,
+  Sparkles,
+  Building2,
+  Quote,
+  ShieldCheck,
+  CreditCard,
+  QrCode,
+  Building,
+  Landmark,
+  ScrollText,
+  Construction,
+  HandHeart,
+  Award
+} from 'lucide-react';
 
 const About = () => {
-  const { t } = useLanguage();
   const [activeSection, setActiveSection] = useState('history');
 
-  const sidebarLinks = [
-    { id: 'history', label: t('sidebar_history') },
-    { id: 'ramanujacharya', label: t('sidebar_ramanuja') },
-    { id: 'shrines', label: t('sidebar_shrines') },
-    { id: 'rituals', label: t('sidebar_rituals') },
-    { id: 'architecture', label: t('sidebar_architecture') }
-  ];
+  useEffect(() => {
+    const sections = ['history', 'blueprint', 'mission', 'donation'];
+    
+    const observerOptions = {
+      root: null,
+      rootMargin: '-150px 0px -70% 0px',
+      threshold: 0
+    };
 
-  const subShrines = [
-    { name: t('seva_parthasarathi_name') || "Sri Parthasarathi Swamy", desc: t('seva_parthasarathi_desc') || "The original presiding deity of the temple site before the installation of Govindara Swamy" },
-    { name: t('shrine_pundarikavalli_name') || "Sri Pundarikavalli Thayar", desc: t('shrine_pundarikavalli_desc') || "A dedicated shrine for the Goddess of Lotus, representing divine compassion." },
-    { name: t('shrine_andal_name') || "Sri Andal (Choodikudutha Nachiyar)", desc: t('shrine_andal_desc') || "The patron saint who offered floral garlands to the Lord." },
-    { name: t('shrine_chakra_name') || "Sri Chakrathalwar", desc: t('shrine_chakra_desc') || "The deity of the divine Sudarshana Chakra, the protective weapon of Vishnu." },
-    { name: t('shrine_alwars_name') || "The 12 Alwars", desc: t('shrine_alwars_desc') || "Individual shrines for the great Vaishnava saints who sang the glory of the Lord." }
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    sections.forEach(id => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      setActiveSection(id); // Immediately set active for better UX
+      const offset = 120;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  const constructionList = [
+    { name: "Main Temple Complex", status: "In Progress" },
+    { name: "Goshala (Cow Sanctuary)", status: "Expanding" },
+    { name: "Yagashala", status: "Planned" },
+    { name: "Kalyan Mandapam", status: "In Progress" },
+    { name: "Navagraha Mandapam", status: "Planned" },
+    { name: "Ranganayaka Mandapam", status: "Planned" },
+    { name: "Goda Mandapam", status: "Planned" },
+    { name: "Veda Patashala", status: "Upcoming" }
   ];
 
   return (
-    <div className="about-modern section-padding">
-      <div className="container about-grid">
-        {/* Sidebar */}
-        <aside className="about-sidebar">
-          <div className="sidebar-card glass-card">
-            <h3>{t('about_directory')}</h3>
-            <div className="sidebar-links">
-              {sidebarLinks.map((link) => (
-                <button
-                  key={link.id}
-                  className={`sidebar-link ${activeSection === link.id ? 'active' : ''}`}
-                  onClick={() => {
-                    setActiveSection(link.id);
-                    document.getElementById(link.id)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                  }}
-                >
-                  <ChevronRight size={18} />
-                  <span>{link.label}</span>
-                </button>
-              ))}
+    <div className="temple-portal">
+      {/* Official Header Section - Matching Bhadradri Style */}
+      <header className="portal-header">
+        <div className="header-top">
+          <div className="container portal-header-inner">
+            <div className="portal-brand">
+              <img src="/logo.png" alt="Devasthanam" className="portal-logo" style={{ height: '80px' }} />
+              <div>
+                <h1>SRI GOVINDHA RAJA SWAMY VARI DEVASTHANAM</h1>
+                <p>Jagadgiri Gutta, Hyderabad - 757796 | Established: 2008</p>
+              </div>
             </div>
+            <div className="portal-status-badge">
+              <ShieldCheck size={18} />
+              <span>Official Foundation Portal</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
-            <div className="quick-info mt-4">
-              <h4>{t('pilgrim_facilities')}</h4>
-              <p><Heart size={14} /> {t('facility_annadanam')}</p>
-              <p><Clock size={14} /> {t('facility_support')}</p>
-              <p><Bookmark size={14} /> {t('facility_booking')}</p>
+      {/* Main Content Blueprint Layout */}
+      <main className="container portal-grid">
+        {/* Left Sidebar Menu - Fixed Navigation */}
+        <aside className="portal-nav-aside">
+          <div className="nav-card glass-card">
+            <h3>Devasthanam Menu</h3>
+            <div className="nav-list">
+              <button className={activeSection === 'history' ? 'active' : ''} onClick={() => scrollToSection('history')}>
+                <History size={18} /> About Devasthanam
+              </button>
+              <button className={activeSection === 'blueprint' ? 'active' : ''} onClick={() => scrollToSection('blueprint')}>
+                <ScrollText size={18} /> Master Blueprint
+              </button>
+              <button className={activeSection === 'mission' ? 'active' : ''} onClick={() => scrollToSection('mission')}>
+                <Construction size={18} /> Mission Govindham
+              </button>
+              <button className={activeSection === 'donation' ? 'active' : ''} onClick={() => scrollToSection('donation')}>
+                <HandHeart size={18} /> Divine Offerings
+              </button>
+            </div>
+          </div>
+
+          <div className="portal-sidebar-info glass-card">
+            <h4>Contact Details</h4>
+            <div className="side-contact">
+              <Phone size={14} />
+              <span>8143477307 / 8686658856</span>
+            </div>
+            <div className="side-contact">
+              <Mail size={14} />
+              <span>info@govindharajaswamydevasthanam.com</span>
             </div>
           </div>
         </aside>
 
-        {/* Content Area */}
-        <div className="about-main-content">
-          <div className="breadcrumb">
-            <span>{t('breadcrumb_home')}</span> <ChevronRight size={14} /> <span>{t('breadcrumb_about')}</span>
-          </div>
-
-          <motion.div
-            className="content-card glass-card"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <h1 className="main-title">{t('temple_name')}</h1>
-            <p className="subtitle-te">{t('about_main_title')}</p>
-
-            <div className="content-image-top">
-              <img src="/assets/saint.png" alt="Main Temple" />
-              <div className="img-caption">{t('about_img_caption')}</div>
+        {/* Scrollable Content Area */}
+        <div className="portal-main-view glass-card">
+          {/* History Section */}
+          <motion.section id="history" className="view-section" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div className="section-header">
+              <h2>Sri Govindharaja Swamy Devasthanam: An Epitome of Divine Grace and Benevolence</h2>
+              <div className="title-underline"></div>
             </div>
 
-            <section id="history" className="content-section">
-              <h2><Landmark className="marker" /> {t('history_title')}</h2>
-              <div className="drop-cap-text">
-                <p>{t('history_p1')}</p>
-                <p>{t('history_p2')}</p>
+            <div className="sacred-content">
+              <p className="lead-para">
+                Nestled amidst the tranquil environs of Jagadgiri Gutta, Sri Govindharaja Swamy Devasthanam emerges as a celestial abode, beckoning devotees to partake in the divine splendor and benevolence.
+              </p>
+              <p>
+                Conceived in the divine vision of <strong>Sri Haripuri Narahari Swamy in 2008</strong>, the temple's genesis is imbued with the celestial touch of Lord Sri Lakshmi Narayana, who ordained its establishment with divine clarity and purpose.
+              </p>
+              <p>
+                Enshrined within its hallowed sanctum is Lord Govindha, the eternal embodiment of divine grace and compassion. Devotees flock from distant corners to bask in His radiance and seek solace in His boundless love. Lord Govindha, the bestower of blessings and remover of obstacles, holds sway over the hearts and minds of His devotees, guiding them through life's myriad challenges with unwavering grace and benevolence.
+              </p>
+              <p>
+                In reverence to the divine decree, Sri Govindharaja Swamy Devasthanam stands not merely as a temple but as a bastion of spiritual enlightenment and societal harmony. Central to the temple's ethos is its unwavering commitment to social welfare, where the resplendent halls reverberate with the joyous echoes of <strong>annadanam</strong>.
+              </p>
+
+              <div className="gallery-preview">
+                <img src="/assets/MainGovindaSwami.jpg.jpeg" alt="Swamy Vari Vigraham" />
+                <img src="/utsava_murthulu_procession_1777447548249.png" alt="Utsava Murthulu" />
               </div>
+            </div>
+          </motion.section>
 
-              <div className="image-float-right">
-                <img src="/assets/deity.png" alt="Deity" />
-                <p>{t('deity_form')}</p>
+          <div className="section-divider"></div>
+
+          {/* Blueprint Section */}
+          <motion.section id="blueprint" className="view-section" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div className="section-header">
+              <h2>Temple Complex Master Blueprint</h2>
+              <div className="title-underline"></div>
+            </div>
+            <p>Following the blueprint of traditional Vastu and spiritual excellence, the temple complex plan includes multi-functional mandapams and spiritual hubs.</p>
+
+            <div className="blueprint-container">
+              <img src="/temple_blueprint_plan_1777447500616.png" alt="Technical Blueprint" className="blueprint-main-img" />
+              <div className="blueprint-stats">
+                <div className="stat-item">
+                  <span className="stat-val">Architectural Style</span>
+                  <span className="stat-label">Ancient Dravidian</span>
+                </div>
+                <div className="stat-item">
+                  <span className="stat-val">Core Vision</span>
+                  <span className="stat-label">Mission Govindham</span>
+                </div>
               </div>
+            </div>
+          </motion.section>
 
-              <p>{t('history_p3')}</p>
-            </section>
+          <div className="section-divider"></div>
 
-            <section id="ramanujacharya" className="content-section">
-              <h2><BookOpen className="marker" /> {t('ramanuja_title')}</h2>
-              <p>{t('ramanuja_p1')}</p>
-              <p>{t('ramanuja_p2')}</p>
-            </section>
+          {/* Mission Section */}
+          <motion.section id="mission" className="view-section" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div className="section-header">
+              <h2>Ongoing Sacred Constructions</h2>
+              <div className="title-underline"></div>
+            </div>
+            <p>Support Sri Govindharaja Swamy Devasthanam constructions to sustain our operations and expand our services to those in need.</p>
 
-            <section id="shrines" className="content-section">
-              <h2><Sparkles className="marker" /> {t('shrines_title')}</h2>
-              <p>{t('shrines_p1')}</p>
-              <div className="bento-shrines">
-                {subShrines.map((shrine, i) => (
-                  <div key={i} className="shrine-card">
-                    <h4>{shrine.name}</h4>
-                    <p>{shrine.desc}</p>
+            <img src="/temple_construction_mission_1777447566900.png" alt="Mission Construction" className="mission-main-img" />
+
+            <div className="construction-milestones">
+              {constructionList.map((item, idx) => (
+                <div key={idx} className="milestone-row">
+                  <Building2 size={20} />
+                  <div className="milestone-info">
+                    <strong>{item.name}</strong>
+                    <span className={`status-tag ${item.status.toLowerCase().replace(' ', '-')}`}>{item.status}</span>
                   </div>
-                ))}
-              </div>
-              <p>{t('shrines_p2')}</p>
-            </section>
+                </div>
+              ))}
+            </div>
 
-            <section id="rituals" className="content-section">
-              <h2><Clock className="marker" /> {t('rituals_title')}</h2>
-              <p>{t('rituals_p1')}</p>
-              <div className="quote-box">
-                "{t('rituals_quote')}"
-              </div>
-              <p>{t('rituals_p2')}</p>
-            </section>
+            <div className="tax-benefit-alert">
+              <ShieldCheck size={24} />
+              <p>All donations made towards these constructions are <strong>100% tax-exempted</strong> under section 80G of the Income Tax Act.</p>
+            </div>
+          </motion.section>
 
-            <section id="architecture" className="content-section">
-              <h2><MapPin className="marker" /> {t('architecture_title')}</h2>
-              <p>{t('architecture_p1')}</p>
-              <div className="double-image-grid">
-                <img src="/assets/main_govindaraja.png" alt="Main Sanctum Interior" />
-                <img src="/assets/saint.png" alt="Architectural Perspective" />
+          <div className="section-divider"></div>
+
+          {/* Donation Section */}
+          <motion.section id="donation" className="view-section" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+            <div className="section-header">
+              <h2>Support the Mission - Bank Account Details</h2>
+              <div className="title-underline"></div>
+            </div>
+
+            <div className="puranic-quote-card">
+              <Quote size={24} className="q-icon" />
+              <p className="telugu-verse">
+                తపః పరం కృతయుగే త్రేతాయాం జ్ఞానముచ్యతే | <br />
+                ద్వాపరే యజ్ఞమేవాహుః దానమేవ కలౌ యుగే ||
+              </p>
+              <p className="english-translation">
+                "When in the age of penance, knowledge was paramount, In the Treta Yuga, sacrifice was esteemed,<br />
+                In the Dvapara Yuga, they extolled only the performance of sacrifices,<br />
+                But in the Kali Yuga, they say, charity to temples alone is supreme."
+              </p>
+              <div className="merit-highlight">
+                Equivalent to donating 30 cows & performing 25 Sudarshana Yagas.
               </div>
-              <p>{t('architecture_p2')}</p>
-            </section>
-          </motion.div>
+            </div>
+
+            <div className="bank-details-blueprint">
+              <div className="bank-header-row">
+                <Building size={24} />
+                <h3>Official Contribution Details</h3>
+              </div>
+              <div className="bank-table">
+                <div className="bank-row">
+                  <span>Account Name</span>
+                  <strong>Govindhara raja swamy devasthanam foundation</strong>
+                </div>
+                <div className="bank-row">
+                  <span>Account Number</span>
+                  <strong className="primary-text" style={{ fontSize: '1.4rem' }}>42270392915</strong>
+                </div>
+                <div className="bank-row">
+                  <span>IFSC Code</span>
+                  <strong>SBIN0014676</strong>
+                </div>
+                <div className="bank-row">
+                  <span>Bank & Branch</span>
+                  <strong>SBI, Cyber Gateway, Hi-Tech City, Hyderabad</strong>
+                </div>
+              </div>
+              <div className="caution-footer">
+                <strong>IMPORTANT:</strong> Verify accounts before transfer. Official contact: 8143477307
+              </div>
+            </div>
+          </motion.section>
         </div>
-      </div>
+      </main>
 
       <style>{`
-        .about-modern {
-          background: #fdfaf3;
-          margin-top: 80px;
+        .temple-portal {
+          
+          min-height: 100vh;
+          margin-top: 2rem;
+          padding-bottom: 5rem;
         }
 
-        .about-grid {
+        .portal-header {
+          background: var(--secondary);
+          color: white;
+          padding: 2.5rem 0;
+          border-bottom: 3px solid var(--accent);
+          position: relative;
+          overflow: hidden;
+        }
+
+        .portal-header-inner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 2rem;
+          flex-wrap: wrap;
+        }
+
+        .portal-brand {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+        }
+
+        .portal-brand h1 {
+          font-size: 1.6rem;
+          margin: 0;
+          font-family: var(--font-heading);
+          color: var(--accent);
+          letter-spacing: 0.5px;
+        }
+
+        .portal-brand p {
+          margin: 0.2rem 0 0;
+          font-size: 0.85rem;
+          opacity: 0.7;
+          font-weight: 600;
+        }
+
+        .portal-status-badge {
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          background: rgba(212, 175, 55, 0.2);
+          padding: 0.6rem 1.2rem;
+          border-radius: 50px;
+          border: 1px solid var(--accent);
+          color: var(--accent);
+          font-weight: 700;
+          font-size: 0.9rem;
+        }
+
+        .portal-grid {
           display: grid;
           grid-template-columns: 320px 1fr;
           gap: 3rem;
+          margin-top: 3rem;
         }
 
-        .about-sidebar {
+        .portal-nav-aside {
+          width: 100%;
+          max-width: 100%;
           position: sticky;
           top: 120px;
-          height: fit-content;
+          height: calc(100vh - 140px);
+          overflow-y: auto;
+          scrollbar-width: none;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
         }
 
-        .sidebar-card {
-          padding: 2rem;
+        .portal-nav-aside::-webkit-scrollbar {
+          display: none;
+        }
+
+        .nav-card {
           background: white;
-          border-left: 5px solid var(--primary);
+          border-radius: 15px;
+          overflow: hidden;
+          border-top: 4px solid var(--primary);
         }
 
-        .sidebar-card h3 {
-          font-size: 1.25rem;
+        .nav-card h3 {
+          padding: 1.2rem 1.5rem;
+          margin: 0;
+          background: var(--bg-offset);
+          color: var(--secondary);
+          font-size: 1rem;
+          border-bottom: 1px solid #eee;
+        }
+
+        .nav-list {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .nav-list button {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem 1.5rem;
+          text-align: left;
+          font-weight: 700;
+          color: var(--text-muted);
+          border-bottom: 1px solid #f9f9f9;
+          transition: all 0.3s;
+        }
+
+        .nav-list button:hover {
+          background: #fff9f0;
+          color: var(--primary);
+        }
+
+        .nav-list button.active {
+          background: var(--primary);
+          color: white;
+        }
+
+        .portal-sidebar-info {
+          margin-top: 2rem;
+          padding: 1.5rem;
+          background: white;
+        }
+
+        .portal-sidebar-info h4 {
+          color: var(--secondary);
+          margin-bottom: 1rem;
+          border-bottom: 2px solid var(--accent);
+          padding-bottom: 0.5rem;
+        }
+
+        .side-contact {
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          font-size: 0.8rem;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 1rem;
+        }
+
+        .portal-main-view {
+          padding: 4rem;
+          background: white;
+        }
+
+        .section-header {
+          margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+          font-size: clamp(1.3rem, 3.5vw, 2rem);
+          color: var(--secondary);
+          font-family: var(--font-heading);
+          line-height: 1.3;
+          margin-bottom: 0.8rem;
+          word-break: break-word;
+        }
+
+        .title-underline {
+          width: 60px;
+          height: 4px;
+          background: var(--primary);
+          border-radius: 2px;
+        }
+
+        .sacred-content p {
+          font-size: 1.1rem;
+          line-height: 1.9;
           margin-bottom: 1.5rem;
+          color: var(--text);
+          text-align: justify;
+        }
+
+        .lead-para {
+          font-weight: 700;
+          color: var(--secondary);
+          font-size: 1.25rem !important;
+        }
+
+        .gallery-preview {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+          margin-top: 2rem;
+        }
+
+        .gallery-preview img {
+          width: 100%;
+          max-width: 100%;
+          z-index: 1200;
+          height: 250px;
+          object-fit: cover;
+          border-radius: 12px;
+          border: 1px solid var(--accent);
+        }
+
+        .blueprint-container {
+          margin-top: 2rem;
+          border: 2px solid var(--accent);
+          padding: 1.5rem;
+          border-radius: 20px;
+        }
+
+        .blueprint-main-img, .mission-main-img {
+          width: 100%;
+          max-width: 600px;
+          display: block;
+          margin: 0 auto 2rem;
+          border-radius: 10px;
+          border: 1px solid var(--accent);
+          height: auto;
+        }
+
+        .blueprint-stats {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 2rem;
+          text-align: center;
+        }
+
+        .blueprint-stats .stat-item {
+          background: #f8f9fa;
+          padding: 2rem;
+          border-radius: 15px;
+          border: 1px solid #eee;
+          transition: transform 0.3s ease;
+        }
+
+        .blueprint-stats .stat-item:hover {
+          transform: translateY(-5px);
+          border-color: var(--accent);
+        }
+
+        .stat-item {
+          padding: 1rem;
+          background: var(--bg-offset);
+          border-radius: 12px;
+        }
+
+        .stat-val {
+          display: block;
+          font-weight: 800;
+          color: var(--secondary);
+          font-size: 1.1rem;
+          word-break: break-word;
+          white-space: normal;
+        }
+
+        .stat-label {
+          display: block;
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          margin-top: 0.3rem;
+        }
+
+        .construction-milestones {
+          display: grid;
+          gap: 1rem;
+          margin-top: 2rem;
+        }
+
+        .milestone-row {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          padding: 1.2rem;
+          background: #fdfaf3;
+          border-radius: 12px;
+          border: 1px solid #eee;
+        }
+
+        .milestone-info {
+          flex: 1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .status-tag {
+          font-size: 0.75rem;
+          font-weight: 800;
+          padding: 0.3rem 1rem;
+          border-radius: 50px;
+          text-transform: uppercase;
+        }
+
+        .status-tag.in-progress { background: #fff7ed; color: #c2410c; }
+        .status-tag.expanding { background: #f0fdf4; color: #15803d; }
+        .status-tag.planned { background: #eff6ff; color: #1d4ed8; }
+        .status-tag.upcoming { background: #f5f5f5; color: #737373; }
+
+        .tax-benefit-alert {
+          margin-top: 3rem;
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          padding: 1.5rem;
+          background: #f0fdf4;
+          border-radius: 12px;
+          color: #166534;
+        }
+
+        .tax-benefit-alert p {
+          margin: 0;
+          font-weight: 600;
+        }
+
+        .puranic-quote-card {
+          background: #fff9f0;
+          padding: 3rem;
+          border-radius: 20px;
+          border-left: 5px solid var(--accent);
+          margin-bottom: 3rem;
+          position: relative;
+          text-align: center;
+        }
+
+        .q-icon { color: var(--accent); opacity: 0.4; margin-bottom: 1rem; }
+
+        .telugu-verse {
+          font-size: 1.6rem !important;
+          font-weight: 700;
+          color: var(--secondary);
+          line-height: 1.6 !important;
+          margin-bottom: 1.5rem !important;
+          font-family: inherit;
+        }
+
+        .english-translation {
+          font-size: 1.1rem !important;
+          font-style: italic;
+          color: var(--text-muted);
+          line-height: 1.8 !important;
+          margin-bottom: 1.5rem !important;
+        }
+
+        .merit-highlight {
+          font-weight: 800;
+          color: var(--primary);
+          text-transform: uppercase;
+          font-size: 0.9rem;
+          letter-spacing: 0.5px;
+        }
+
+        .bank-details-blueprint {
+          padding: 3rem;
+          border: 2px solid var(--accent);
+          background: white;
+          border-radius: 20px;
+        }
+
+        .bank-header-row {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 2.5rem;
           color: var(--secondary);
           border-bottom: 1px solid #eee;
           padding-bottom: 1rem;
         }
 
-        .sidebar-links {
+        .bank-table {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 1.5rem;
         }
 
-        .sidebar-link {
+        .bank-row {
           display: flex;
-          align-items: center;
-          gap: 0.8rem;
-          padding: 0.8rem 1rem;
-          border-radius: 8px;
-          text-align: left;
-          color: var(--text-muted);
-          transition: all 0.3s ease;
-          background: none;
-          cursor: pointer;
+          justify-content: space-between;
+          padding-bottom: 1rem;
+          border-bottom: 1px dashed #eee;
         }
 
-        .sidebar-link:hover {
-          background: var(--marble);
-          color: var(--primary);
-        }
+        .bank-row span { color: var(--text-muted); font-weight: 600; }
+        .bank-row strong { color: var(--secondary); text-align: right; }
+        .primary-text { color: var(--primary) !important; }
 
-        .sidebar-link.active {
-          background: var(--primary);
-          color: white;
-        }
-
-        .quick-info h4 {
-          font-size: 1rem;
-          margin: 1.5rem 0 1rem;
-          color: var(--secondary);
-        }
-
-        .quick-info p {
-          display: flex;
-          align-items: center;
-          gap: 0.8rem;
-          font-size: 0.9rem;
-          color: var(--text-muted);
-          margin-bottom: 0.8rem;
-        }
-
-        .breadcrumb {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          margin-bottom: 1.5rem;
-          color: var(--text-muted);
-          font-size: 0.9rem;
-          font-weight: 500;
-        }
-
-        .content-card {
-          padding: 4rem;
-          background: white;
-          box-shadow: 0 10px 50px rgba(0,0,0,0.05);
-        }
-
-        .main-title {
-          font-size: 3rem;
-          color: var(--secondary);
-          margin-bottom: 0.5rem;
-        }
-
-        .subtitle-te {
-          font-size: 1.25rem;
-          color: var(--primary);
-          margin-bottom: 2.5rem;
-          font-weight: 600;
-        }
-
-        .content-image-top img {
-          width: 100%;
-          height: 450px;
-          object-fit: cover;
-          border-radius: 20px;
-        }
-
-        .img-caption {
-          background: var(--marble);
+        .caution-footer {
+          margin-top: 2rem;
+          background: #fef2f2;
+          color: #991b1b;
           padding: 1rem;
-          text-align: center;
-          font-size: 0.9rem;
-          font-style: italic;
-          color: var(--text-muted);
-          margin-top: 10px;
-          border-radius: 8px;
-        }
-
-        .content-section {
-          margin-bottom: 4rem;
-          scroll-margin-top: 140px;
-        }
-
-        .content-section h2 {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          font-size: 1.8rem;
-          color: var(--secondary);
-          margin-bottom: 1.5rem;
-          border-bottom: 1px solid #eee;
-          padding-bottom: 0.75rem;
-        }
-
-        .marker {
-          color: var(--primary);
-        }
-
-        .drop-cap-text p:first-of-type::first-letter {
-          font-size: 3.5rem;
-          float: left;
-          line-height: 1;
-          padding-right: 10px;
-          color: var(--primary);
-          font-weight: 700;
-          font-family: var(--font-heading);
-        }
-
-        .content-section p {
-          font-size: 1.1rem;
-          line-height: 1.9;
-          color: var(--text);
-          margin-bottom: 1.5rem;
-          text-align: justify;
-        }
-
-        .image-float-right {
-          float: right;
-          width: 320px;
-          margin-left: 2rem;
-          margin-bottom: 2rem;
-          padding: 1rem;
-          background: #fff;
-          border: 1px solid #eee;
-          border-radius: 15px;
-          text-align: center;
-          box-shadow: var(--shadow);
-        }
-
-        .image-float-right img {
-          width: 100%;
           border-radius: 10px;
+          text-align: center;
+          font-size: 0.85rem;
         }
 
-        .bento-shrines {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 1.5rem;
-          margin: 2rem 0;
+        .section-divider {
+          height: 1px;
+          background: linear-gradient(to right, transparent, var(--accent), transparent);
+          margin: 4rem 0;
+          opacity: 0.5;
         }
 
-        .shrine-card {
-          padding: 1.5rem;
-          background: var(--marble);
-          border-radius: 12px;
-          border-left: 3px solid var(--primary);
+        .view-section {
+          scroll-margin-top: 120px;
         }
 
-        .shrine-card h4 {
-          color: var(--secondary);
-          margin-bottom: 0.5rem;
+        /* ── Laptop (≤1200px) ── */
+        @media (max-width: 1200px) {
+          .portal-grid { grid-template-columns: 260px 1fr; gap: 2rem; }
+          .portal-main-view { padding: 3rem; }
         }
 
-        .shrine-card p {
-          font-size: 0.95rem !important;
-          margin: 0 !important;
-          line-height: 1.5 !important;
+        /* ── Tablet landscape (≤1024px) ── */
+        @media (max-width: 1024px) {
+          .portal-grid { grid-template-columns: 240px 1fr; gap: 1.5rem; }
+          .portal-brand h1 { font-size: 1.4rem; }
+          .portal-main-view { padding: 2.5rem; }
+          .blueprint-stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
         }
 
-        .quote-box {
-          border-left: 4px solid var(--primary);
-          padding: 1.5rem 2rem;
-          background: #fff9f0;
-          font-style: italic;
-          font-size: 1.2rem;
-          color: var(--secondary);
-          margin: 2.5rem 0;
-          font-weight: 500;
+        /* ── Tablet portrait (≤900px) — single column layout ── */
+        @media (max-width: 900px) {
+          .portal-header-inner {
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+            gap: 1rem;
+          }
+          .portal-brand {
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+          }
+          .portal-brand h1 { font-size: 1.25rem; }
+          .portal-grid { grid-template-columns: 1fr; gap: 2rem; }
+          .portal-nav-aside {
+            position: static;
+            height: auto;
+            order: -1;
+          }
+          .nav-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+          }
+          .nav-list button {
+            padding: 0.8rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            justify-content: center;
+          }
+          .portal-sidebar-info { display: none; }
+          .portal-main-view { padding: 2.5rem; }
+          .gallery-preview { grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .bank-row { flex-direction: column; gap: 0.3rem; }
+          .bank-row strong { text-align: left; }
+          .blueprint-stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .blueprint-container { padding: 1rem; }
         }
 
-        .double-image-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 1.5rem;
-          margin: 2rem 0;
+        /* ── Mobile (≤640px) ── */
+        @media (max-width: 640px) {
+          .portal-header { padding: 1.5rem 0; }
+          .portal-brand h1 { font-size: 1.1rem; letter-spacing: 0; }
+          .portal-brand p { font-size: 0.8rem; }
+          .portal-status-badge { font-size: 0.8rem; padding: 0.5rem 1rem; }
+          .portal-main-view { padding: 1.5rem; }
+          .section-header { margin-bottom: 1.5rem; }
+          .sacred-content p { font-size: 1rem; }
+          .gallery-preview { grid-template-columns: 1fr; }
+          .gallery-preview img { height: 200px; }
+          .blueprint-stats { grid-template-columns: 1fr; gap: 0.8rem; }
+          .blueprint-stats .stat-item { padding: 1.2rem; }
+          .milestone-row { gap: 1rem; padding: 1rem; }
+          .milestone-info { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
+          .stat-item { padding: 0.8rem; }
+          .stat-val { font-size: 0.9rem; }
+          .nav-list { grid-template-columns: 1fr; }
+          .nav-list button { justify-content: flex-start; }
+          .bank-details-blueprint, .puranic-quote-card { padding: 1.5rem; }
+          .telugu-verse { font-size: 1.1rem !important; }
+          .section-divider { margin: 2rem 0; }
+          .construction-milestones { gap: 0.8rem; }
         }
 
-        .double-image-grid img {
-          width: 100%;
-          height: 280px;
-          object-fit: cover;
-          border-radius: 15px;
-        }
-
-        @media (max-width: 1100px) {
-          .about-grid { grid-template-columns: 1fr; }
-          .about-sidebar { display: none; }
-          .content-card { padding: 2rem; }
-          .image-float-right { float: none; width: 100%; margin-left: 0; }
+        /* ── Very small phones (≤380px) ── */
+        @media (max-width: 380px) {
+          .portal-brand h1 { font-size: 0.95rem; }
+          .portal-main-view { padding: 1rem; }
+          .blueprint-stats .stat-val { font-size: 0.85rem; }
+          .milestone-row { flex-wrap: wrap; }
         }
       `}</style>
     </div>

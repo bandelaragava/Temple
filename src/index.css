@@ -4,19 +4,27 @@
   --primary: #FF9933;
   --primary-hover: #E68A00;
   --secondary: #800000;
-  --accent: #D4AF37;
-  /* Gold */
+  --accent: #D4AF37; /* Gold */
+  --sacred-red: #B02B2B;
+  --sacred-gold: #F7EF8A;
+  --divine-blue: #E3F2FD;
   --text: #1A1A1A;
   --text-muted: #666666;
-  --bg: #FFFDF5; /* Warm Temple Cream */
+  --bg: #FEF9E5; /* Bhadradri Light Cream */
   --bg-offset: #FDF5E6; /* Old Lace / Parchment */
-  --marble: #F5F5F5;
+  --marble: #F5E6D3; /* Sand / Marble */
   --glass: rgba(255, 255, 255, 0.85);
   --glass-border: rgba(128, 0, 0, 0.1);
   --shadow: 0 10px 40px rgba(128, 0, 0, 0.05);
   --transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
   --font-main: 'Outfit', sans-serif;
   --font-heading: 'Playfair Display', serif;
+  
+  /* Multi-color Gradients */
+  --grad-saffron: linear-gradient(135deg, #FF9933 0%, #FFB366 100%);
+  --grad-maroon: linear-gradient(135deg, #800000 0%, #B02B2B 100%);
+  --grad-gold: linear-gradient(135deg, #D4AF37 0%, #F7EF8A 100%);
+  --grad-divine: linear-gradient(135deg, #FFF9F9 0%, #FFFDF5 50%, #E3F2FD 100%);
 }
 
 [data-theme='dark'] {
@@ -34,8 +42,15 @@
   --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
 }
 
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  position: relative;
+}
+
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
 }
 
 * {
@@ -48,19 +63,199 @@ html {
 body {
   font-family: var(--font-main);
   background-color: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  overflow-x: hidden;
-  transition: background-color 0.3s ease;
   background-image: 
-    linear-gradient(rgba(255, 253, 245, 0.97), rgba(255, 253, 245, 0.97)),
-    url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23800000' fill-opacity='0.03'%3E%3Cpath d='M40 40c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20zm-40 0c0-11 9-20 20-20s20 9 20 20-9 20-20 20-20-9-20-20z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    linear-gradient(rgba(254, 249, 229, 0.92), rgba(254, 249, 229, 0.92)),
+    url("https://www.transparenttextures.com/patterns/parchment.png"); /* Subtle parchment texture */
+  color: var(--text);
+  transition: background-color 0.3s ease;
+  background-attachment: fixed;
+  position: relative;
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
+#root {
+  width: 100%;
+}
+
+.page-header {
+  margin-bottom: 3.5rem;
+}
+
+.page-header.centered {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.page-header h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+  margin: 1rem 0;
+  color: var(--secondary);
+  word-break: break-word;
+}
+
+.page-header p {
+  max-width: 700px;
+  color: var(--text-muted);
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+  line-height: 1.6;
+}
+
+.modern-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 50px;
+  background: var(--primary);
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  /* Sophisticated Mehendi / Paisley Motif Pattern */
+  background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23800000' stroke-width='0.4' fill='none' stroke-opacity='0.05'%3E%3Cpath d='M50 10 Q60 30 50 50 Q40 30 50 10' /%3E%3Cpath d='M10 50 Q30 40 50 50 Q30 60 10 50' /%3E%3Cpath d='M90 50 Q70 40 50 50 Q70 60 90 50' /%3E%3Cpath d='M50 90 Q60 70 50 50 Q40 70 50 90' /%3E%3Ccircle cx='50' cy='50' r='8' /%3E%3Ccircle cx='50' cy='50' r='12' stroke-dasharray='1,2' /%3E%3C!-- Paisley petals --%3E%3Cpath d='M50 25 C65 25 75 40 50 50 C25 40 35 25 50 25' /%3E%3Cpath d='M50 75 C65 75 75 60 50 50 C25 60 35 75 50 75' /%3E%3Cpath d='M25 50 C25 35 40 25 50 50 C40 75 25 65 25 50' /%3E%3Cpath d='M75 50 C75 35 60 25 50 50 C60 75 75 65 75 50' /%3E%3C/g%3E%3C/svg%3E");
+  background-size: 400px 400px;
+  z-index: -1;
+  pointer-events: none;
+}
+
+
+
+.official-banner {
+  background: url("/assets/GovindaTemple.jpg.jpeg") center/100% 100% no-repeat;
+  aspect-ratio: 10 / 1; /* REDUCED HEIGHT (WAS 6/1) WITHOUT CUTTING */
+  width: 100%;
+  border-top: 4px solid #4b0000;
+  border-bottom: 2px solid #d4af37;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+  .official-banner {
+    background-size: cover;
+  }
+  .banner-container {
+    padding: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .official-banner {
+    aspect-ratio: auto;
+    padding: 1rem 0;
+  }
+  .banner-container {
+    padding: 0 0.5rem;
+    gap: 0.5rem;
+  }
+  .banner-icon { height: 40px; }
+  .tel-title { font-size: 1.4rem; }
+  .eng-title { font-size: 0.8rem; letter-spacing: 2px; }
+  .loc-title { font-size: 0.8rem; }
+  .temple-seal img { height: 60px; width: 60px; }
+  .sacred-symbols-top { font-size: 1.2rem; margin-bottom: 0.1rem; }
+}
+
+.banner-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  padding: 0 5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  min-height: 100px; /* added to ensure height if aspect ratio is removed */
+}
+
+.banner-left, .banner-right {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.banner-icon {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.08));
+  transition: all 0.3s ease;
+}
+
+.banner-icon:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 6px 15px rgba(0,0,0,0.12));
+}
+
+.banner-center {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.sacred-symbols-top {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 0.2rem;
+  font-size: 1.6rem;
+  color: #d4af37;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+}
+
+.sacred-divider {
+  width: 150px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #d4af37, #f7ef8a, #d4af37, transparent);
+}
+
+.eng-title {
+  color: #1a1a1a;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.tel-title {
+  color: #4b0000;
+  font-family: 'Cinzel', serif;
+  font-size: 2.1rem;
+  font-weight: 900;
+  margin: 0;
+  background: linear-gradient(135deg, #4b0000 0%, #8b0000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.loc-title {
+  color: #4b0000;
+  font-weight: 700;
+  font-size: 1.1rem;
+  font-family: 'Cinzel', serif;
+}
+
+.temple-seal img {
+  height: 100px;
+  width: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--accent);
+  background: white;
+  padding: 5px;
 }
 
 
@@ -110,6 +305,18 @@ button {
   padding: 0 2rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 0.75rem;
+  }
+}
+
 .glass-card {
   background: var(--glass);
   backdrop-filter: blur(16px);
@@ -148,12 +355,89 @@ button {
   box-shadow: 0 6px 20px rgba(255, 153, 51, 0.4);
 }
 
+.btn-secondary {
+  background: transparent;
+  color: var(--secondary);
+  padding: 0.8rem 2rem;
+  border-radius: 50px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 2px solid var(--secondary);
+  transition: var(--transition);
+}
+
+.btn-secondary:hover {
+  background: var(--secondary);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-multi-color {
+  background: linear-gradient(135deg, var(--secondary), var(--primary), var(--accent));
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
+  color: white;
+  padding: 1rem 2.5rem;
+  border-radius: 50px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  box-shadow: 0 10px 30px rgba(128, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border: none;
+}
+
+.btn-multi-color:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(128, 0, 0, 0.25);
+  filter: brightness(1.1);
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .section-padding {
   padding: 3rem 0;
+}
+
+@media (max-width: 768px) {
+  .section-padding { padding: 2rem 0; }
+  .btn-primary, .btn-secondary, .btn-multi-color { padding: 0.7rem 1.5rem; font-size: 0.9rem; }
+  .grid-2 { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 480px) {
+  .section-padding { padding: 1.5rem 0; }
+  .btn-primary, .btn-secondary, .btn-multi-color { width: 100%; justify-content: center; }
 }
 
 .text-gradient {
   background: linear-gradient(135deg, var(--primary), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* --- Google Translate Overrides --- */
+.goog-te-banner-frame.skiptranslate,
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-tooltip,
+.VIpgJd-ZVi9od-l4eHX-hSRGPd {
+    display: none !important;
+}
+
+body {
+    top: 0px !important;
+}
+
+.goog-text-highlight {
+    background-color: transparent !important;
+    border: none !important; 
+    box-shadow: none !important;
 }

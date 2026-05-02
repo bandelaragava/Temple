@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Clock } from 'lucide-react';
 
 import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '../../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const DaySchedule = () => {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('daily');
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -17,8 +17,16 @@ const DaySchedule = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const cmsRituals = localStorage.getItem('dailyRituals');
+  const parsedRituals = cmsRituals ? JSON.parse(cmsRituals).map((r: any) => ({
+    id: r.id, start: r.time.split(' - ')[0] || r.time, end: r.time.split(' - ')[1] || '23:59', seva: r.name, desc: r.desc || ''
+  })) : null;
+
+  const cmsWeekly = localStorage.getItem('weeklyRituals');
+  const parsedWeekly = cmsWeekly ? JSON.parse(cmsWeekly) : null;
+
   const scheduleData = {
-    daily: [
+    daily: parsedRituals || [
       { id: 1, start: '03:00', end: '03:30', seva: t('seva_suprabhata'), desc: t('seva_suprabhata_desc') },
       { id: 2, start: '03:30', end: '04:30', seva: t('seva_tomala'), desc: t('seva_tomala_desc') },
       { id: 3, start: '04:30', end: '05:00', seva: t('seva_koluva'), desc: t('seva_koluva_desc') },
@@ -29,7 +37,7 @@ const DaySchedule = () => {
       { id: 8, start: '19:00', end: '20:00', seva: t('seva_deepa'), desc: t('seva_deepa_desc') },
       { id: 9, start: '20:00', end: '21:00', seva: t('seva_ekanta'), desc: t('seva_ekanta_desc') },
     ],
-    weekly: [
+    weekly: parsedWeekly || [
       { id: 'w1', day: t('day_monday'), seva: t('seva_vishesat'), icon: '✨', color: '#FF9933' },
       { id: 'w2', day: t('day_tuesday'), seva: t('seva_ashtadala'), icon: '🌸', color: '#800000' },
       { id: 'w3', day: t('day_wednesday'), seva: t('seva_kalasa'), icon: '⚱️', color: '#D4AF37' },
@@ -210,7 +218,7 @@ const DaySchedule = () => {
           color: var(--text-muted);
           max-width: 700px;
           margin: 0 auto;
-          font-size: 1.1rem;
+          font-size: clamp(0.9rem, 2vw, 1.1rem);
           line-height: 1.8;
         }
 
@@ -221,7 +229,7 @@ const DaySchedule = () => {
         }
 
         .tab-pill {
-          background: rgba(255, 255, 255, 0.9);
+          background: var(--bg);
           padding: 0.5rem;
           border-radius: 100px;
           display: flex;
@@ -380,7 +388,7 @@ const DaySchedule = () => {
           display: flex;
           flex-direction: column;
           gap: 1rem;
-          background: rgba(255, 255, 255, 0.9);
+          background: var(--bg);
           backdrop-filter: blur(10px);
         }
 
@@ -466,6 +474,19 @@ const DaySchedule = () => {
           .timeline-item:nth-child(even) { flex-direction: row; }
           .timeline-marker { left: 30px; }
           .timeline-card { width: 100%; }
+          .schedule-controls { margin-bottom: 3rem; }
+        }
+
+        @media (max-width: 640px) {
+          .bento-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
+          .bento-item { padding: 1rem; }
+          .schedule-header-premium { margin-bottom: 2.5rem; }
+        }
+
+        @media (max-width: 480px) {
+          .bento-grid { grid-template-columns: 1fr; }
+          .tab-pill-item { padding: 0.6rem 1.4rem; font-size: 0.85rem; }
+          .schedule-controls { margin-bottom: 2rem; }
         }
       `}</style>
     </section>

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Smartphone, ShieldCheck, Heart, Info, Landmark, Copy, Check } from 'lucide-react';
-import { useLanguage } from '../context/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const EHundi = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const vpa = "devasthanam@upi";
 
@@ -25,7 +25,7 @@ const EHundi = () => {
 
         <div className="ehundi-grid">
           {/* QR Section */}
-          <motion.div 
+          <motion.div
             className="qr-section glass-card"
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -36,9 +36,9 @@ const EHundi = () => {
                   {/* Detailed SVG Placeholder for QR */}
                   <div className="qr-graphic">
                     <svg viewBox="0 0 100 100" className="qr-svg">
-                       <rect width="100" height="100" fill="white" />
-                       <path d="M10 10h30v30h-30zM15 15v20h20v-20zM22 22h6v6h-6zM60 10h30v30h-30zM65 15v20h20v-20zM72 22h6v6h-6zM10 60h30v30h-30zM15 65v20h20v-20zM22 72h6v6h-6z" fill="#1A1A1A" />
-                       <path d="M45 10h10v10h-10zM10 45h10v10h-10zM45 45h10v10h-10zM60 45h40v10h-40zM45 60h10v40h-10zM60 60h10v10h-10zM80 60h20v10h-20zM60 80h10v20h-10zM80 80h20v20h-20z" fill="#1A1A1A" />
+                      <rect width="100" height="100" fill="white" />
+                      <path d="M10 10h30v30h-30zM15 15v20h20v-20zM22 22h6v6h-6zM60 10h30v30h-30zM65 15v20h20v-20zM72 22h6v6h-6zM10 60h30v30h-30zM15 65v20h20v-20zM22 72h6v6h-6z" fill="#1A1A1A" />
+                      <path d="M45 10h10v10h-10zM10 45h10v10h-10zM45 45h10v10h-10zM60 45h40v10h-40zM45 60h10v40h-10zM60 60h10v10h-10zM80 60h20v10h-20zM60 80h10v20h-10zM80 80h20v20h-20z" fill="#1A1A1A" />
                     </svg>
                     <div className="upi-center-logo">UPI</div>
                   </div>
@@ -63,7 +63,7 @@ const EHundi = () => {
           </motion.div>
 
           {/* Info Section */}
-          <motion.div 
+          <motion.div
             className="hundi-info"
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
@@ -75,7 +75,7 @@ const EHundi = () => {
                 <p>{t('hundi_secure_desc')}</p>
               </div>
             </div>
-            
+
             <div className="info-item glass-card mb-3">
               <Landmark className="icon-gold" />
               <div>
@@ -111,7 +111,7 @@ const EHundi = () => {
 
       <style>{`
         .ehundi-page {
-          margin-top: 100px;
+          margin-top: 30px;
           min-height: 80vh;
         }
 
@@ -247,6 +247,33 @@ const EHundi = () => {
 
         @media (max-width: 900px) {
           .ehundi-grid, .faq-grid { grid-template-columns: 1fr; }
+          .qr-section { padding: 2rem; }
+        }
+
+        @media (max-width: 600px) {
+          .vpa-box {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+          }
+          .qr-section, .hundi-faq-section {
+             padding: 1.5rem;
+          }
+          .vpa-value {
+             font-size: 1rem;
+             word-break: break-all;
+          }
+          .qr-graphic {
+            width: 180px;
+            height: 180px;
+          }
+          .info-item { padding: 1.5rem; gap: 1rem; }
+        }
+
+        @media (max-width: 400px) {
+          .qr-graphic { width: 150px; height: 150px; }
+          .vpa-text { flex-direction: column; gap: 0.25rem; }
+          .btn-copy { width: 100%; justify-content: center; }
         }
       `}</style>
     </div>
