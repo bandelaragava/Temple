@@ -11,8 +11,12 @@ interface Props {
 const ProductCard: React.FC<Props> = ({ product, onAddToCart, onViewDetails }) => (
   <div className="sp-card" onClick={() => onViewDetails(product)}>
     {product.badge && <span className="sp-badge">{product.badge}</span>}
-    <div className="sp-img" style={{ background: product.gradient }}>
-      <span className="sp-emoji">{product.emoji}</span>
+    <div className="sp-img" style={{ background: product.image ? 'white' : product.gradient }}>
+      {product.image ? (
+        <img src={product.image} alt={product.name} className="sp-real-img" />
+      ) : (
+        <span className="sp-emoji">{product.emoji}</span>
+      )}
     </div>
     <div className="sp-body">
       <p className="sp-cat">{product.category}</p>
@@ -86,6 +90,16 @@ const ProductCard: React.FC<Props> = ({ product, onAddToCart, onViewDetails }) =
         font-size: 4.5rem;
         filter: drop-shadow(0 4px 12px rgba(0,0,0,0.18));
         user-select: none;
+      }
+      .sp-real-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 0.5rem;
+        transition: transform 0.5s ease;
+      }
+      .sp-card:hover .sp-real-img {
+        transform: scale(1.1);
       }
       .sp-body {
         padding: 1rem 1.1rem 1.1rem;

@@ -32,7 +32,7 @@ const OrderConfirmation: React.FC<Props> = ({ cart, orderDetails, orderId, onSho
         </div>
         <h1 className="oc-title">Order Placed Successfully!</h1>
         <p className="oc-subtitle">
-          🙏 May Lord Hanuman's blessings be with you. Your order is confirmed and will be shipped soon.
+          🙏 May Lord SRI GOVINDHA RAJA SWAMI VARI 's blessings be with you. Your order is confirmed and will be shipped soon.
         </p>
         <div className="oc-order-id">
           Order ID: <strong>#{orderId}</strong>
@@ -42,7 +42,7 @@ const OrderConfirmation: React.FC<Props> = ({ cart, orderDetails, orderId, onSho
       <div className="oc-layout">
         {/* Left: Items */}
         <div className="oc-items-col glass-card" style={{ padding: '1.5rem' }}>
-          <h3 className="oc-section-title"><Package size={18}/> Items Ordered</h3>
+          <h3 className="oc-section-title"><Package size={18} /> Items Ordered</h3>
           {cart.map(item => (
             <div key={item.id} className="oc-item">
               <div className="oc-item-img" style={{ background: item.gradient }}>
@@ -56,13 +56,13 @@ const OrderConfirmation: React.FC<Props> = ({ cart, orderDetails, orderId, onSho
             </div>
           ))}
 
-          <div className="oc-divider"/>
+          <div className="oc-divider" />
           <div className="oc-bill-row"><span>Subtotal</span><span>₹{total}</span></div>
           <div className="oc-bill-row">
             <span>Delivery</span>
-            <span>{delivery === 0 ? <span style={{color:'#2e7d32'}}>FREE</span> : `₹${delivery}`}</span>
+            <span>{delivery === 0 ? <span style={{ color: '#2e7d32' }}>FREE</span> : `₹${delivery}`}</span>
           </div>
-          <div className="oc-divider"/>
+          <div className="oc-divider" />
           <div className="oc-bill-row oc-grand">
             <span>Total Paid</span><span>₹{grand}</span>
           </div>
@@ -91,15 +91,15 @@ const OrderConfirmation: React.FC<Props> = ({ cart, orderDetails, orderId, onSho
           <div className="oc-timeline glass-card" style={{ padding: '1.5rem' }}>
             <h3 className="oc-section-title">🕐 Delivery Timeline</h3>
             {[
-              { icon: '✅', label: 'Order Confirmed',   done: true },
-              { icon: '🙏', label: 'Temple Blessing',   done: true },
+              { icon: '✅', label: 'Order Confirmed', done: true },
+              { icon: '🙏', label: 'Temple Blessing', done: true },
               { icon: '📦', label: 'Packing & Dispatch', done: false },
-              { icon: '🚚', label: 'Out for Delivery',  done: false },
-              { icon: '🏠', label: 'Delivered',         done: false },
+              { icon: '🚚', label: 'Out for Delivery', done: false },
+              { icon: '🏠', label: 'Delivered', done: false },
             ].map((step, i) => (
               <div key={i} className={`oc-step ${step.done ? 'done' : ''}`}>
                 <div className="oc-step-icon">{step.icon}</div>
-                <div className="oc-step-line"/>
+                <div className="oc-step-line" />
                 <span>{step.label}</span>
               </div>
             ))}
@@ -110,10 +110,10 @@ const OrderConfirmation: React.FC<Props> = ({ cart, orderDetails, orderId, onSho
       {/* CTAs */}
       <div className="oc-ctas">
         <button className="oc-btn-shop" onClick={onShopMore}>
-          <ShoppingBag size={18}/> Shop More
+          <ShoppingBag size={18} /> Shop More
         </button>
         <button className="oc-btn-home" onClick={onGoHome}>
-          <Home size={18}/> Go to Home
+          <Home size={18} /> Go to Home
         </button>
       </div>
 

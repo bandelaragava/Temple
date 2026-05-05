@@ -28,8 +28,12 @@ const ProductDetail: React.FC<Props> = ({ product, onBack, onAddToCart, onBuyNow
       <div className="pd-grid">
         {/* Left: Image */}
         <div className="pd-img-side">
-          <div className="pd-img-box" style={{ background: product.gradient }}>
-            <span className="pd-img-emoji">{product.emoji}</span>
+          <div className="pd-img-box" style={{ background: product.image ? 'white' : product.gradient }}>
+            {product.image ? (
+              <img src={product.image} alt={product.name} className="pd-real-img" />
+            ) : (
+              <span className="pd-img-emoji">{product.emoji}</span>
+            )}
             {product.badge && <span className="pd-img-badge">{product.badge}</span>}
           </div>
           <div className="pd-trust-badges">
@@ -134,6 +138,13 @@ const ProductDetail: React.FC<Props> = ({ product, onBack, onAddToCart, onBuyNow
           box-shadow: 0 20px 50px rgba(0,0,0,0.1);
         }
         .pd-img-emoji { font-size: 9rem; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.2)); }
+        .pd-real-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          border-radius: 24px;
+          padding: 1rem; /* Added padding to give some space around the full image */
+        }
         .pd-img-badge {
           position: absolute; top: 16px; left: 16px;
           background: linear-gradient(135deg,#800000,#B02B2B);

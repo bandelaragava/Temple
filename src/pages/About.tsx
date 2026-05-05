@@ -354,6 +354,7 @@ const About = () => {
           display: flex;
           flex-direction: column;
           gap: 1.5rem;
+          min-width: 250px; /* Added minimum width for sidebar content */
         }
 
         .portal-nav-aside::-webkit-scrollbar {
@@ -391,6 +392,12 @@ const About = () => {
           color: var(--text-muted);
           border-bottom: 1px solid #f9f9f9;
           transition: all 0.3s;
+          line-height: 1.4; /* Better line height for wrapped text */
+          word-break: break-word; /* Ensure long words don't overflow */
+        }
+
+        .nav-list button svg {
+          flex-shrink: 0; /* Prevent icon from shrinking */
         }
 
         .nav-list button:hover {
@@ -688,13 +695,13 @@ const About = () => {
 
         /* ── Laptop (≤1200px) ── */
         @media (max-width: 1200px) {
-          .portal-grid { grid-template-columns: 260px 1fr; gap: 2rem; }
+          .portal-grid { grid-template-columns: 280px 1fr; gap: 2rem; }
           .portal-main-view { padding: 3rem; }
         }
 
         /* ── Tablet landscape (≤1024px) ── */
         @media (max-width: 1024px) {
-          .portal-grid { grid-template-columns: 240px 1fr; gap: 1.5rem; }
+          .portal-grid { grid-template-columns: 260px 1fr; gap: 1.5rem; }
           .portal-brand h1 { font-size: 1.4rem; }
           .portal-main-view { padding: 2.5rem; }
           .blueprint-stats { grid-template-columns: 1fr 1fr; gap: 1rem; }
