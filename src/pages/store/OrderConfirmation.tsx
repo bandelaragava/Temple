@@ -32,7 +32,7 @@ const OrderConfirmation: React.FC<Props> = ({ cart, orderDetails, orderId, onSho
         </div>
         <h1 className="oc-title">Order Placed Successfully!</h1>
         <p className="oc-subtitle">
-          🙏 May Lord SRI GOVINDHA RAJA SWAMI VARI 's blessings be with you. Your order is confirmed and will be shipped soon.
+          🙏 May Lord SRI GOVINDHA RAJA SWAMY VARI 's blessings be with you. Your order is confirmed and will be shipped soon.
         </p>
         <div className="oc-order-id">
           Order ID: <strong>#{orderId}</strong>

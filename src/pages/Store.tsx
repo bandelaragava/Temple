@@ -127,7 +127,7 @@ const Store: React.FC = () => {
               {/* ── Special Banner ── */}
               <section className="special-banner-section">
                 <div className="special-banner-grid">
-                  <div className="special-banner sb-prasadam" onClick={() => setSelectedCategory('special')}>
+                  <div className="special-banner sb-prasadam" onClick={() => setSelectedCategory('prasadam')}>
                     <span className="sb-icon">🎁</span>
                     <div>
                       <h3>Temple Special Prasadam</h3>
@@ -231,8 +231,12 @@ const Store: React.FC = () => {
                 <div className="special-featured-grid">
                   {specialProducts.slice(0, 3).map(p => (
                     <div key={p.id} className="sf-card" onClick={() => viewDetails(p)}>
-                      <div className="sf-img" style={{ background: p.gradient }}>
-                        <span>{p.emoji}</span>
+                      <div className="sf-img" style={{ background: p.image ? 'white' : p.gradient }}>
+                        {p.image ? (
+                          <img src={p.image} alt={p.name} className="sf-real-img" />
+                        ) : (
+                          <span>{p.emoji}</span>
+                        )}
                         {p.badge && <span className="sf-badge">{p.badge}</span>}
                       </div>
                       <div className="sf-info">
@@ -497,6 +501,16 @@ const Store: React.FC = () => {
         .sf-img {
           height: 160px; display: flex; align-items: center;
           justify-content: center; font-size: 4rem; position: relative;
+        }
+        .sf-real-img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          padding: 0.5rem;
+          transition: transform 0.5s ease;
+        }
+        .sf-card:hover .sf-real-img {
+          transform: scale(1.1);
         }
         .sf-badge {
           position: absolute; top: 10px; left: 10px;
