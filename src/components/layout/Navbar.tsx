@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Globe, User, Heart, Bell } from 'lucide-react';
+import { Menu, X, Globe, User, Heart, Bell, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
@@ -49,6 +49,9 @@ const Navbar = () => {
           ))}
 
           <Link to="/language" className="icon-link"><Globe size={20} /></Link>
+          <Link to="/store" className={`icon-link store-nav-icon ${location.pathname === '/store' ? 'active-store' : ''}`} title="Temple Store">
+            <ShoppingBag size={20} />
+          </Link>
           
           {isLoggedIn && (
             <div 
@@ -148,6 +151,9 @@ const Navbar = () => {
             
             <Link to="/language" onClick={() => setIsMobileMenuOpen(false)}>
               <Globe size={18} style={{ marginRight: '8px', display: 'inline' }} /> Language
+            </Link>
+            <Link to="/store" onClick={() => setIsMobileMenuOpen(false)}>
+              <ShoppingBag size={18} style={{ marginRight: '8px', display: 'inline' }} /> Temple Store
             </Link>
             
             <Link to="/account" onClick={() => setIsMobileMenuOpen(false)}>
@@ -435,6 +441,21 @@ const Navbar = () => {
           font-weight: 600;
         }
         .view-all-notes:hover { text-decoration: underline; }
+
+        .store-nav-icon { position: relative; }
+        .store-nav-icon.active-store { color: #d4af37; }
+        .store-nav-icon::after {
+          content: 'NEW';
+          position: absolute;
+          top: -8px; right: -16px;
+          background: #e67e22;
+          color: white;
+          font-size: 0.5rem;
+          font-weight: 900;
+          padding: 1px 4px;
+          border-radius: 4px;
+          letter-spacing: 0.5px;
+        }
 
         @media (max-width: 992px) {
         }

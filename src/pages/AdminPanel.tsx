@@ -30,9 +30,13 @@ import {
   Image,
   Clock,
   Heart,
-  Ticket
+  Ticket,
+  ShoppingCart,
+  Menu,
+  User
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { PRODUCTS } from './store/storeData';
 
 const Admin = () => {
   const { t } = useTranslation();
@@ -45,6 +49,23 @@ const Admin = () => {
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [passwordHovered, setPasswordHovered] = useState(false);
   const mainContentRef = React.useRef<HTMLDivElement>(null);
+
+  const notificationRef = React.useRef<HTMLDivElement>(null);
+  const profileRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowAdminNotifications(false);
+      }
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (mainContentRef.current) {
@@ -91,11 +112,11 @@ const Admin = () => {
       { id: 2, name: 'Vaikuntha Ekadashi', date: 'Jan 02', duration: '1 Day', status: 'Scheduled', imageUrl: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=400' },
       { id: 3, name: 'Ratha Saptami', date: 'Feb 14', duration: '1 Day', status: 'Planned', imageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400' },
     ];
-    
+
     // Auto-update broken Unsplash URL for Brahmotsavam
-    return data.map((f: any) => 
-      f.name === 'Annual Brahmotsavam' && f.imageUrl.includes('unsplash.com') 
-        ? { ...f, imageUrl: '/assets/annual_brahmotsavam.png' } 
+    return data.map((f: any) =>
+      f.name === 'Annual Brahmotsavam' && f.imageUrl.includes('unsplash.com')
+        ? { ...f, imageUrl: '/assets/annual_brahmotsavam.png' }
         : f
     );
   });
@@ -113,17 +134,23 @@ const Admin = () => {
   const [maintenanceMode, setMaintenanceMode] = useState(false);
   const [adminKey, setAdminKey] = useState('admin123');
   const [showAdminNotifications, setShowAdminNotifications] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
   const [formData, setFormData] = useState<any>({});
   const [filterDate, setFilterDate] = useState('');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+
   const [adminNotifications, setAdminNotifications] = useState([
     { id: 1, title: 'Critical Booking', message: 'VIP Darshan slot requested for tomorrow.', time: '5m ago', type: 'warning', unread: true },
     { id: 2, title: 'Server Status', message: 'Temple database backup completed successfully.', time: '1h ago', type: 'info', unread: false },
     { id: 3, title: 'Payment Alert', message: 'Bulk donation received from Overseas Devotee Trust.', time: '3h ago', type: 'success', unread: true },
   ]);
+
+  const handleNavClick = (section: string) => {
+    setActiveSection(section);
+    setIsSidebarOpen(false);
+  };
 
   const [registeredUsers, setRegisteredUsers] = useState(() => {
     const saved = localStorage.getItem('registeredUsers');
@@ -165,9 +192,9 @@ const Admin = () => {
 
   const [panchangam, setPanchangam] = useState(() => {
     const saved = localStorage.getItem('panchangam');
-    return saved ? JSON.parse(saved) : { 
-      tithi: 'Ekadashi', 
-      nakshatram: 'Rohini', 
+    return saved ? JSON.parse(saved) : {
+      tithi: 'Ekadashi',
+      nakshatram: 'Rohini',
       yogam: 'Siddha',
       karanam: 'Bava',
       sunrise: '06:12 AM',
@@ -193,10 +220,10 @@ const Admin = () => {
   const [darshanTypes, setDarshanTypes] = useState(() => {
     const saved = localStorage.getItem('darshanTypes');
     return saved ? JSON.parse(saved) : [
-      { 
-        id: 1, 
-        name: 'Sarva Darshan', 
-        timings: '06:00 AM - 11:00 PM', 
+      {
+        id: 1,
+        name: 'Sarva Darshan',
+        timings: '06:00 AM - 11:00 PM',
         entryDetails: 'Free for all via Vaikuntam Queue',
         description: 'General darshan for all devotees.',
         liveUpdates: 'Normal Flow',
@@ -210,6 +237,11 @@ const Admin = () => {
     return saved ? JSON.parse(saved) : [
       { id: 1, url: 'https://images.unsplash.com/photo-1600080800683-162e249fbd9c?auto=format&fit=crop&w=800', title: 'Temple Gopuram' }
     ];
+  });
+
+  const [storeProducts, setStoreProducts] = useState(() => {
+    const saved = localStorage.getItem('storeProducts');
+    return saved ? JSON.parse(saved) : PRODUCTS;
   });
 
   // Generic save handler
@@ -232,10 +264,10 @@ const Admin = () => {
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email) return;
-    const newUser = { 
-      name: formData.name, 
-      email: formData.email, 
-      registered: new Date().toISOString().split('T')[0] 
+    const newUser = {
+      name: formData.name,
+      email: formData.email,
+      registered: new Date().toISOString().split('T')[0]
     };
     const updated = [...registeredUsers, newUser];
     setRegisteredUsers(updated);
@@ -274,8 +306,8 @@ const Admin = () => {
     setActiveModal(null);
   };
 
-  const filteredUsers = registeredUsers.filter((u: any) => 
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredUsers = registeredUsers.filter((u: any) =>
+    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -318,7 +350,7 @@ const Admin = () => {
   };
 
   const handleExportDonations = () => {
-    const csvContent = "data:text/csv;charset=utf-8," 
+    const csvContent = "data:text/csv;charset=utf-8,"
       + "ID,Name,Type,Amount,Date\n"
       + donations.map(d => `${d.id},${d.name},${d.type},${d.amount},${d.date}`).join("\n");
     const encodedUri = encodeURI(csvContent);
@@ -330,9 +362,14 @@ const Admin = () => {
     document.body.removeChild(link);
   };
 
-  const filteredBookings = filterDate 
-    ? bookings.filter(b => b.date === filterDate)
-    : bookings;
+  const filteredBookings = bookings.filter(b => {
+    const matchesDate = !filterDate || b.date === filterDate;
+    const matchesSearch = !searchQuery || 
+      b.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      b.seva.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesDate && matchesSearch;
+  });
 
   if (!isAdminLoggedIn) {
     return (
@@ -474,13 +511,13 @@ const Admin = () => {
     <div className={`admin-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
       {/* Sidebar Mobile Toggle */}
       <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-        {isSidebarOpen ? <X size={24} /> : <LayoutDashboard size={24} />}
+        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
       {/* Sidebar Overlay for Mobile */}
       <AnimatePresence>
         {isSidebarOpen && (
-          <motion.div 
+          <motion.div
             className="sidebar-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -493,86 +530,92 @@ const Admin = () => {
       {/* Sidebar */}
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
-          <Globe size={24} color="#d4af37" />
+          <img src="/logo.png" alt="Temple Logo" className="admin-logo-img" />
           <span>Devasthanam Admin</span>
         </div>
 
         <nav className="sidebar-nav">
           <button
             className={`nav-btn ${activeSection === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveSection('overview')}
+            onClick={() => handleNavClick('overview')}
           >
             <LayoutDashboard size={18} /> Overview
           </button>
           <button
             className={`nav-btn ${activeSection === 'templeEnvironment' ? 'active' : ''}`}
-            onClick={() => setActiveSection('templeEnvironment')}
+            onClick={() => handleNavClick('templeEnvironment')}
           >
             <Globe size={18} /> Temple Environment
           </button>
           <button
             className={`nav-btn ${activeSection === 'dailyRitual' ? 'active' : ''}`}
-            onClick={() => setActiveSection('dailyRitual')}
+            onClick={() => handleNavClick('dailyRitual')}
           >
             <Clock size={18} /> Daily Ritual
           </button>
           <button
             className={`nav-btn ${activeSection === 'panchangam' ? 'active' : ''}`}
-            onClick={() => setActiveSection('panchangam')}
+            onClick={() => handleNavClick('panchangam')}
           >
             <Calendar size={18} /> Panchangam & Vishesham
           </button>
           <button
             className={`nav-btn ${activeSection === 'users' ? 'active' : ''}`}
-            onClick={() => setActiveSection('users')}
+            onClick={() => handleNavClick('users')}
           >
             <Users size={18} /> User Account Details
           </button>
           <button
             className={`nav-btn ${activeSection === 'darshan' ? 'active' : ''}`}
-            onClick={() => setActiveSection('darshan')}
+            onClick={() => handleNavClick('darshan')}
           >
             <Eye size={18} /> Darshan
           </button>
           <button
             className={`nav-btn ${activeSection === 'bookings' ? 'active' : ''}`}
-            onClick={() => setActiveSection('bookings')}
+            onClick={() => handleNavClick('bookings')}
           >
             <Ticket size={18} /> Booking
           </button>
           <button
             className={`nav-btn ${activeSection === 'gallery' ? 'active' : ''}`}
-            onClick={() => setActiveSection('gallery')}
+            onClick={() => handleNavClick('gallery')}
           >
             <Image size={18} /> Gallery
           </button>
           <button
             className={`nav-btn ${activeSection === 'festivals' ? 'active' : ''}`}
-            onClick={() => setActiveSection('festivals')}
+            onClick={() => handleNavClick('festivals')}
           >
             <BarChart3 size={18} /> Festivals
           </button>
           <button
             className={`nav-btn ${activeSection === 'donations' ? 'active' : ''}`}
-            onClick={() => setActiveSection('donations')}
+            onClick={() => handleNavClick('donations')}
           >
             <Heart size={18} /> Donate Now
           </button>
           <button
             className={`nav-btn ${activeSection === 'sevas' ? 'active' : ''}`}
-            onClick={() => setActiveSection('sevas')}
+            onClick={() => handleNavClick('sevas')}
           >
             <Bell size={18} /> Seva & Darshan
           </button>
           <button
+            className={`nav-btn ${activeSection === 'store' ? 'active' : ''}`}
+            onClick={() => handleNavClick('store')}
+          >
+            <ShoppingCart size={18} /> Temple Store
+          </button>
+          <button
             className={`nav-btn ${activeSection === 'content' ? 'active' : ''}`}
-            onClick={() => setActiveSection('content')}
+            onClick={() => handleNavClick('content')}
           >
             <FileText size={18} /> CMS
           </button>
 
           <div className="sidebar-divider"></div>
-          <button className="nav-btn logout" onClick={() => setIsAdminLoggedIn(false)}>
+          <button className="nav-btn logout" onClick={() => { setIsAdminLoggedIn(false); setIsSidebarOpen(false); }}>
             <ShieldCheck size={18} /> Exit Sanctuary
           </button>
         </nav>
@@ -582,7 +625,7 @@ const Admin = () => {
       <AnimatePresence>
         {activeModal && (
           <div className="admin-modal-overlay" onClick={() => setActiveModal(null)}>
-            <motion.div 
+            <motion.div
               className="admin-modal-card glass-card"
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -600,11 +643,11 @@ const Admin = () => {
                     <>
                       <div className="form-group">
                         <label>Full Name</label>
-                        <input type="text" required onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g. Srinivasa Rao" />
+                        <input type="text" required onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Srinivasa Rao" />
                       </div>
                       <div className="form-group">
                         <label>Email Address</label>
-                        <input type="email" required onChange={e => setFormData({...formData, email: e.target.value})} placeholder="devotee@example.com" />
+                        <input type="email" required onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="devotee@example.com" />
                       </div>
                     </>
                   )}
@@ -613,16 +656,16 @@ const Admin = () => {
                     <>
                       <div className="form-group">
                         <label>Seva Name</label>
-                        <input type="text" required onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g. Sahasra Deepalankara" />
+                        <input type="text" required onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Sahasra Deepalankara" />
                       </div>
                       <div className="form-row">
                         <div className="form-group">
                           <label>Price (₹)</label>
-                          <input type="text" required onChange={e => setFormData({...formData, price: e.target.value})} placeholder="₹ 500" />
+                          <input type="text" required onChange={e => setFormData({ ...formData, price: e.target.value })} placeholder="₹ 500" />
                         </div>
                         <div className="form-group">
                           <label>Daily Slots</label>
-                          <input type="number" required onChange={e => setFormData({...formData, slots: e.target.value})} placeholder="50" />
+                          <input type="number" required onChange={e => setFormData({ ...formData, slots: e.target.value })} placeholder="50" />
                         </div>
                       </div>
                     </>
@@ -632,11 +675,11 @@ const Admin = () => {
                     <>
                       <div className="form-group">
                         <label>Festival Name</label>
-                        <input type="text" required onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g. Vaikuntha Ekadashi" />
+                        <input type="text" required onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Vaikuntha Ekadashi" />
                       </div>
                       <div className="form-group">
                         <label>Start Date</label>
-                        <input type="date" required onChange={e => setFormData({...formData, date: e.target.value})} />
+                        <input type="date" required onChange={e => setFormData({ ...formData, date: e.target.value })} />
                       </div>
                     </>
                   )}
@@ -652,7 +695,7 @@ const Admin = () => {
 
         {selectedBooking && (
           <div className="admin-modal-overlay" onClick={() => setSelectedBooking(null)}>
-            <motion.div 
+            <motion.div
               className="admin-modal-card glass-card"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -697,28 +740,37 @@ const Admin = () => {
       {/* Main Content */}
       <main className="admin-main" ref={mainContentRef}>
         <header className="admin-header">
+          <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img src="/logo.png" alt="Logo" className="header-logo-img" />
+            <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent)', fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>
+              {siteContent.templeName}
+            </h2>
+          </div>
           <div className="header-search">
             <Search size={18} />
-            <input 
-              type="text" 
-              placeholder="Search devotees, records..." 
+            <input
+              type="text"
+              placeholder="Search devotees, records..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
           <div className="header-actions">
-            <div className="notification-wrapper-admin">
-              <button 
-                className="icon-btn-admin" 
-                onClick={() => setShowAdminNotifications(!showAdminNotifications)}
+            <div className="notification-wrapper-admin" ref={notificationRef}>
+              <button
+                className="icon-btn-admin"
+                onClick={() => {
+                  setShowAdminNotifications(!showAdminNotifications);
+                  setShowProfileDropdown(false);
+                }}
               >
-                <Bell size={20} />
+                <Bell size={18} />
                 {adminNotifications.filter(n => n.unread).length > 0 && <span className="admin-badge"></span>}
               </button>
-              
+
               <AnimatePresence>
                 {showAdminNotifications && (
-                  <motion.div 
+                  <motion.div
                     className="admin-notification-dropdown glass-card"
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -726,7 +778,7 @@ const Admin = () => {
                   >
                     <div className="admin-note-header">
                       <h3>Sacred Alerts</h3>
-                      <button onClick={() => setAdminNotifications(adminNotifications.map(n => ({...n, unread: false})))}>Mark all read</button>
+                      <button onClick={() => setAdminNotifications(adminNotifications.map(n => ({ ...n, unread: false })))}>Mark all read</button>
                     </div>
                     <div className="admin-note-list">
                       {adminNotifications.map(note => (
@@ -744,9 +796,41 @@ const Admin = () => {
                 )}
               </AnimatePresence>
             </div>
-            <div className="admin-profile">
-              <div className="admin-avatar">A</div>
-              <span>Archaka Admin</span>
+            <div className="admin-profile" ref={profileRef} onClick={() => {
+              setShowProfileDropdown(!showProfileDropdown);
+              setShowAdminNotifications(false);
+            }} style={{ cursor: 'pointer', position: 'relative' }}>
+              <div className="admin-avatar"><User size={18} /></div>
+              
+              <AnimatePresence>
+                {showProfileDropdown && (
+                  <motion.div 
+                    className="profile-dropdown glass-card"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="dropdown-header">
+                      <div className="user-info">
+                        <p className="user-name">Archaka Admin</p>
+                        <p className="user-role">Temple Administrator</p>
+                      </div>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <button className="dropdown-item" onClick={() => { setActiveSection('overview'); setShowProfileDropdown(false); }}>
+                       <LayoutDashboard size={16} /> Dashboard
+                    </button>
+                    <button className="dropdown-item" onClick={() => { setActiveSection('content'); setShowProfileDropdown(false); }}>
+                       <Settings size={16} /> Settings
+                    </button>
+                    <div className="dropdown-divider"></div>
+                    <button className="dropdown-item logout-item" onClick={() => setIsAdminLoggedIn(false)}>
+                       <XCircle size={16} /> Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>
@@ -818,7 +902,10 @@ const Admin = () => {
                     <h3>Quick Controls</h3>
                     <div className="quick-controls">
                       <div className="control-item">
-                        <span>Darshan Booking</span>
+                        <div className="control-label">
+                          <Calendar size={18} />
+                          <span>Darshan Booking</span>
+                        </div>
                         <button
                           className={`toggle-btn ${siteContent.bookingEnabled ? 'on' : 'off'}`}
                           onClick={() => setSiteContent({ ...siteContent, bookingEnabled: !siteContent.bookingEnabled })}
@@ -827,12 +914,39 @@ const Admin = () => {
                         </button>
                       </div>
                       <div className="control-item">
-                        <span>E-Hundi Access</span>
+                        <div className="control-label">
+                          <Database size={18} />
+                          <span>E-Hundi Access</span>
+                        </div>
                         <button
                           className={`toggle-btn ${siteContent.donationsEnabled ? 'on' : 'off'}`}
                           onClick={() => setSiteContent({ ...siteContent, donationsEnabled: !siteContent.donationsEnabled })}
                         >
                           {siteContent.donationsEnabled ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
+                        </button>
+                      </div>
+                      <div className="control-item">
+                        <div className="control-label">
+                          <ShieldCheck size={18} />
+                          <span>Maintenance Mode</span>
+                        </div>
+                        <button
+                          className={`toggle-btn ${maintenanceMode ? 'on' : 'off'}`}
+                          onClick={() => setMaintenanceMode(!maintenanceMode)}
+                        >
+                          {maintenanceMode ? <ToggleRight size={32} /> : <ToggleLeft size={32} />}
+                        </button>
+                      </div>
+                      <div className="control-item">
+                        <div className="control-label">
+                          <Eye size={18} />
+                          <span>Live Streaming</span>
+                        </div>
+                        <button
+                          className="toggle-btn on"
+                          onClick={() => alert('Live stream control updated.')}
+                        >
+                          <ToggleRight size={32} />
                         </button>
                       </div>
                     </div>
@@ -930,8 +1044,8 @@ const Admin = () => {
                           <td>
                             <div className="row-actions">
                               <button title="Edit" onClick={() => alert('Edit feature is being updated for security.')}><Edit2 size={16} /></button>
-                              <button 
-                                title="Delete" 
+                              <button
+                                title="Delete"
                                 className="delete"
                                 onClick={() => handleDeleteUser(user.email)}
                               >
@@ -954,9 +1068,9 @@ const Admin = () => {
                   <h2>Darshan Bookings</h2>
                   <div className="date-picker-wrapper">
                     <Calendar size={18} className="picker-icon" />
-                    <input 
-                      type="date" 
-                      className="admin-date-picker" 
+                    <input
+                      type="date"
+                      className="admin-date-picker"
                       value={filterDate}
                       onChange={(e) => setFilterDate(e.target.value)}
                     />
@@ -987,15 +1101,15 @@ const Admin = () => {
                               <div className="row-actions">
                                 {booking.status === 'Pending' && (
                                   <>
-                                    <button 
-                                      className="approve" 
+                                    <button
+                                      className="approve"
                                       onClick={() => handleUpdateBookingStatus(booking.id, 'Confirmed')}
                                       title="Approve"
                                     >
                                       <CheckCircle2 size={16} />
                                     </button>
-                                    <button 
-                                      className="delete" 
+                                    <button
+                                      className="delete"
                                       onClick={() => handleUpdateBookingStatus(booking.id, 'Cancelled')}
                                       title="Reject"
                                     >
@@ -1184,23 +1298,23 @@ const Admin = () => {
                 <div className="editor-grid">
                   <div className="editor-card glass-card">
                     <label>Temple Name</label>
-                    <input type="text" value={siteContent.templeName} onChange={e => setSiteContent({...siteContent, templeName: e.target.value})} />
+                    <input type="text" value={siteContent.templeName} onChange={e => setSiteContent({ ...siteContent, templeName: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Contact Email</label>
-                    <input type="email" value={siteContent.contactEmail} onChange={e => setSiteContent({...siteContent, contactEmail: e.target.value})} />
+                    <input type="email" value={siteContent.contactEmail} onChange={e => setSiteContent({ ...siteContent, contactEmail: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Change Admin Key</label>
-                    <input 
-                      type="password" 
-                      placeholder="••••••••" 
+                    <input
+                      type="password"
+                      placeholder="••••••••"
                       onKeyPress={(e) => e.key === 'Enter' && handleUpdateAdminKey((e.target as HTMLInputElement).value)}
                     />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Maintenance Mode</label>
-                    <button 
+                    <button
                       className={`toggle-btn ${maintenanceMode ? 'on' : 'off'}`}
                       onClick={() => setMaintenanceMode(!maintenanceMode)}
                     >
@@ -1228,10 +1342,10 @@ const Admin = () => {
                 <div className="editor-card glass-card">
                   <div className="form-group">
                     <label>Live Video Embed URL</label>
-                    <input 
-                      type="text" 
-                      value={templeEnvContent.videoUrl || ''} 
-                      onChange={(e) => setTempleEnvContent({...templeEnvContent, videoUrl: e.target.value})} 
+                    <input
+                      type="text"
+                      value={templeEnvContent.videoUrl || ''}
+                      onChange={(e) => setTempleEnvContent({ ...templeEnvContent, videoUrl: e.target.value })}
                       placeholder="e.g. https://www.youtube.com/embed/..."
                     />
                     <p style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.5rem' }}>
@@ -1241,9 +1355,9 @@ const Admin = () => {
                   </div>
                   <div className="form-group">
                     <label>Environment Description</label>
-                    <textarea 
+                    <textarea
                       value={templeEnvContent.description || ''}
-                      onChange={(e) => setTempleEnvContent({...templeEnvContent, description: e.target.value})}
+                      onChange={(e) => setTempleEnvContent({ ...templeEnvContent, description: e.target.value })}
                       rows={4}
                       style={{ width: '100%', padding: '1rem', background: 'rgba(0,0,0,0.2)', border: '1px solid var(--glass-border)', color: 'white', borderRadius: '12px' }}
                     />
@@ -1275,7 +1389,7 @@ const Admin = () => {
                 <div className="admin-tabs" style={{ marginBottom: '2rem' }}>
                   <h3 style={{ borderBottom: '2px solid var(--accent)', display: 'inline-block', paddingBottom: '0.5rem' }}>Daily Pulse</h3>
                 </div>
-                
+
                 <div className="editor-grid">
                   {dailyRituals.map((ritual: any, index: number) => (
                     <div key={ritual.id} className="editor-card glass-card">
@@ -1383,35 +1497,35 @@ const Admin = () => {
                 <div className="editor-grid">
                   <div className="editor-card glass-card">
                     <label>Today's Tithi</label>
-                    <input type="text" value={panchangam.tithi} onChange={e => setPanchangam({...panchangam, tithi: e.target.value})} />
+                    <input type="text" value={panchangam.tithi} onChange={e => setPanchangam({ ...panchangam, tithi: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Today's Nakshatram</label>
-                    <input type="text" value={panchangam.nakshatram} onChange={e => setPanchangam({...panchangam, nakshatram: e.target.value})} />
+                    <input type="text" value={panchangam.nakshatram} onChange={e => setPanchangam({ ...panchangam, nakshatram: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Today's Yogam</label>
-                    <input type="text" value={panchangam.yogam} onChange={e => setPanchangam({...panchangam, yogam: e.target.value})} />
+                    <input type="text" value={panchangam.yogam} onChange={e => setPanchangam({ ...panchangam, yogam: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Today's Karanam</label>
-                    <input type="text" value={panchangam.karanam} onChange={e => setPanchangam({...panchangam, karanam: e.target.value})} />
+                    <input type="text" value={panchangam.karanam} onChange={e => setPanchangam({ ...panchangam, karanam: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Sunrise Time</label>
-                    <input type="text" value={panchangam.sunrise} onChange={e => setPanchangam({...panchangam, sunrise: e.target.value})} />
+                    <input type="text" value={panchangam.sunrise} onChange={e => setPanchangam({ ...panchangam, sunrise: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Sunset Time</label>
-                    <input type="text" value={panchangam.sunset} onChange={e => setPanchangam({...panchangam, sunset: e.target.value})} />
+                    <input type="text" value={panchangam.sunset} onChange={e => setPanchangam({ ...panchangam, sunset: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Rahu Kaalam</label>
-                    <input type="text" value={panchangam.rahu} onChange={e => setPanchangam({...panchangam, rahu: e.target.value})} />
+                    <input type="text" value={panchangam.rahu} onChange={e => setPanchangam({ ...panchangam, rahu: e.target.value })} />
                   </div>
                   <div className="editor-card glass-card">
                     <label>Gulika Kaalam</label>
-                    <input type="text" value={panchangam.gulika} onChange={e => setPanchangam({...panchangam, gulika: e.target.value})} />
+                    <input type="text" value={panchangam.gulika} onChange={e => setPanchangam({ ...panchangam, gulika: e.target.value })} />
                   </div>
                 </div>
 
@@ -1469,13 +1583,13 @@ const Admin = () => {
                     <CheckCircle2 size={18} /> {saveStatus}
                   </div>
                 )}
-                
+
                 <div className="admin-tabs" style={{ marginBottom: '2rem' }}>
                   <h3 style={{ borderBottom: '2px solid var(--accent)', display: 'inline-block', paddingBottom: '0.5rem' }}>General Guidelines</h3>
                 </div>
                 <div className="editor-card glass-card">
                   <label>Darshan Guidelines & Important Notes</label>
-                  <textarea 
+                  <textarea
                     value={darshanInfo}
                     onChange={(e) => setDarshanInfo(e.target.value)}
                     rows={4}
@@ -1567,13 +1681,13 @@ const Admin = () => {
                 <div className="editor-grid">
                   {galleryImages.map((img: any, index: number) => (
                     <div key={img.id} className="editor-card glass-card">
-                      <img 
-                        src={img.url} 
-                        alt={img.title} 
+                      <img
+                        src={img.url}
+                        alt={img.title}
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1594322436404-5a0526db4d13?w=800';
                         }}
-                        style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem', border: '1px solid var(--glass-border)' }} 
+                        style={{ width: '100%', height: '150px', objectFit: 'cover', borderRadius: '8px', marginBottom: '1rem', border: '1px solid var(--glass-border)' }}
                       />
                       <div className="form-group">
                         <label>Image Title</label>
@@ -1599,6 +1713,117 @@ const Admin = () => {
                       <Plus size={24} /> Add Image
                     </button>
                   </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Store Products Section */}
+            {activeSection === 'store' && (
+              <motion.div key="store" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <div className="section-header-admin">
+                  <h2>Store Products Management</h2>
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <button className="btn-secondary" onClick={() => saveToCMS('storeProducts', storeProducts)}>
+                      <Save size={18} /> Save Products
+                    </button>
+                    <button className="btn-primary" onClick={() => setStoreProducts([{
+                      id: Date.now(),
+                      name: 'New Product',
+                      price: 0,
+                      category: 'prasadam',
+                      emoji: '🎁',
+                      gradient: 'linear-gradient(135deg,#FF9933,#FFB366)',
+                      shortDesc: 'Short description',
+                      description: 'Full description',
+                      inStock: true,
+                      rating: 5.0,
+                      reviews: 0
+                    }, ...storeProducts])}>
+                      <Plus size={18} /> Add Product
+                    </button>
+                  </div>
+                </div>
+                {saveStatus && (
+                  <div className="save-notification">
+                    <CheckCircle2 size={18} /> {saveStatus}
+                  </div>
+                )}
+                <div className="editor-grid">
+                  {storeProducts.map((product: any, index: number) => (
+                    <div key={product.id} className="editor-card glass-card">
+                      <div className="form-group">
+                        <label>Product Name</label>
+                        <input type="text" value={product.name} onChange={e => {
+                          const newProducts = [...storeProducts];
+                          newProducts[index].name = e.target.value;
+                          setStoreProducts(newProducts);
+                        }} />
+                      </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Price (₹)</label>
+                          <input type="number" value={product.price} onChange={e => {
+                            const newProducts = [...storeProducts];
+                            newProducts[index].price = parseInt(e.target.value) || 0;
+                            setStoreProducts(newProducts);
+                          }} />
+                        </div>
+                        <div className="form-group">
+                          <label>Category</label>
+                          <select
+                            value={product.category}
+                            onChange={e => {
+                              const newProducts = [...storeProducts];
+                              newProducts[index].category = e.target.value;
+                              setStoreProducts(newProducts);
+                            }}
+                            style={{ width: '100%', padding: '1rem', background: 'white', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text)' }}
+                          >
+                            <option value="prasadam">Prasadam</option>
+                            <option value="pooja">Pooja Items</option>
+                            <option value="books">Spiritual Books</option>
+                            <option value="idols">Idols & Photos</option>
+                            <option value="donation">Donation Kits</option>
+                            <option value="special">Special Seva</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Emoji Icon</label>
+                          <input type="text" value={product.emoji} onChange={e => {
+                            const newProducts = [...storeProducts];
+                            newProducts[index].emoji = e.target.value;
+                            setStoreProducts(newProducts);
+                          }} />
+                        </div>
+                        <div className="form-group">
+                          <label>In Stock</label>
+                          <select
+                            value={product.inStock ? 'true' : 'false'}
+                            onChange={e => {
+                              const newProducts = [...storeProducts];
+                              newProducts[index].inStock = e.target.value === 'true';
+                              setStoreProducts(newProducts);
+                            }}
+                            style={{ width: '100%', padding: '1rem', background: 'white', border: '1px solid var(--glass-border)', borderRadius: '12px', color: 'var(--text)' }}
+                          >
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="form-group">
+                        <label>Short Description</label>
+                        <input type="text" value={product.shortDesc} onChange={e => {
+                          const newProducts = [...storeProducts];
+                          newProducts[index].shortDesc = e.target.value;
+                          setStoreProducts(newProducts);
+                        }} />
+                      </div>
+                      <button className="delete" style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', marginTop: '1rem' }} onClick={() => setStoreProducts(storeProducts.filter((p: any) => p.id !== product.id))}>Remove Product</button>
+                    </div>
+                  ))}
                 </div>
               </motion.div>
             )}
@@ -1655,11 +1880,26 @@ const Admin = () => {
           pointer-events: none;
         }
 
+        .admin-logo-img {
+          width: 35px;
+          height: 35px;
+          object-fit: contain;
+          background: white;
+          padding: 3px;
+          border-radius: 8px;
+        }
+
+        .header-logo-img {
+          width: 32px;
+          height: 32px;
+          object-fit: contain;
+        }
+
         .sidebar-logo {
           display: flex;
           align-items: center;
           gap: 1rem;
-          font-size: 1.2rem;
+          font-size: 1.1rem;
           font-weight: 700;
           margin-bottom: 3rem;
           color: var(--accent);
@@ -1752,6 +1992,9 @@ const Admin = () => {
           .admin-header {
             padding-left: 5rem;
           }
+          .header-title {
+            margin-left: 1rem;
+          }
           .dashboard-grid {
             grid-template-columns: 1fr;
           }
@@ -1759,11 +2002,26 @@ const Admin = () => {
 
         @media (max-width: 768px) {
           .stats-row { grid-template-columns: 1fr; gap: 1rem; text-align: center; }
-          .dashboard-grid { grid-template-columns: 1fr; }
-          .header-search { display: flex; width: 100%; max-width: 100%; justify-content: center; margin-bottom: 0.5rem; }
-          .admin-header { height: auto; padding: 4.5rem 1.5rem 1.5rem 1.5rem; flex-direction: column; justify-content: center; align-items: center; }
-          .header-actions { width: 100%; justify-content: center; flex-direction: row; gap: 1rem; }
-          .admin-profile { flex-direction: row; align-items: center; text-align: center; gap: 0.8rem; }
+          .dashboard-grid { 
+            grid-template-columns: 1fr !important; 
+            gap: 2rem;
+            width: 100%;
+          }
+          .grid-item {
+            width: 100%;
+            padding: 1.5rem !important;
+          }
+          .header-search { display: none !important; }
+          .header-title h2 { 
+            font-size: 1rem !important; 
+          }
+          .grid-item h3, .admin-tabs h3 { padding-left: 0.5rem; }
+          .header-title {
+            margin-left: 3.5rem;
+          }
+          .admin-header { height: auto; padding: 1.5rem 0.5rem 1.5rem 5rem; flex-direction: row; justify-content: space-between; align-items: center; gap: 0.5rem; }
+          .header-actions { width: auto; justify-content: flex-end; flex-direction: row; gap: 0.2rem; }
+          .admin-profile { flex-direction: row; align-items: center; text-align: right; gap: 0.5rem; }
           .admin-content { padding: 1.5rem; display: flex; flex-direction: column; align-items: center; }
           .controls-grid { grid-template-columns: 1fr; text-align: center; }
           .editor-grid { grid-template-columns: 1fr; text-align: center; }
@@ -1775,17 +2033,54 @@ const Admin = () => {
         }
 
         @media (max-width: 480px) {
-          .admin-content { padding: 1rem; width: 100%; }
+          .admin-content { padding: 1.5rem 0.5rem; width: 100%; display: flex; flex-direction: column; align-items: center; }
           .stat-card-admin { padding: 1.5rem; gap: 1rem; flex-direction: column; align-items: center; text-align: center; }
-          .grid-item { padding: 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; width: 100%; }
-          .control-card { padding: 1.5rem; flex-direction: column; align-items: center; text-align: center; gap: 1.5rem; }
-          .sidebar-toggle { top: 1rem; left: 1rem; padding: 0.5rem; }
-          .admin-header { padding: 4rem 1rem 1.5rem 1rem; flex-direction: column; justify-content: center; align-items: center; }
+          .grid-item { 
+            padding: 1.2rem !important; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: flex-start; 
+            text-align: left; 
+            width: 94% !important;
+            margin: 0 auto 1.5rem auto;
+          }
+          .control-card { padding: 1.2rem; flex-direction: column; align-items: stretch; text-align: left; gap: 1rem; }
+          .sidebar-toggle { top: 1.2rem; left: 1rem; padding: 0.4rem; border-radius: 10px; }
+          .header-title h2 { 
+            font-size: 0.85rem !important; 
+          }
+          .grid-item h3, .section-header-admin h2, .admin-tabs h3 { padding-left: 0.8rem; }
+          .admin-header { padding: 1.5rem 0rem 1.5rem 4.5rem; flex-direction: row; justify-content: space-between; align-items: center; }
           .user-table-container { overflow-x: auto; width: 100%; }
-          .activity-item { flex-direction: column; align-items: center; text-align: center; gap: 0.8rem; }
-          .control-item { flex-direction: column; align-items: center; text-align: center; gap: 1rem; }
-          .editor-card { align-items: center; text-align: center; width: 100%; }
-          .editor-card input, .editor-card textarea { width: 100%; text-align: center; }
+          .activity-item { 
+            width: 94%;
+            margin: 0 auto;
+            background: var(--bg-offset);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            text-align: left;
+            gap: 0.8rem; 
+          }
+          .control-item { 
+            width: 94%;
+            margin: 0 auto;
+            background: var(--bg-offset);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+            gap: 1rem; 
+          }
+          .editor-card { align-items: flex-start; text-align: left; width: 94% !important; margin: 0 auto; }
+          .editor-card input, .editor-card textarea { width: 100%; text-align: left; }
           .stat-info { align-items: center; }
           /* Smaller responsive buttons */
           .icon-btn-admin { padding: 0.5rem; }
@@ -1822,7 +2117,7 @@ const Admin = () => {
         .admin-header {
           background: var(--glass);
           backdrop-filter: blur(10px);
-          padding: 1.5rem 3rem;
+          padding: 1.5rem 2rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
@@ -1854,13 +2149,13 @@ const Admin = () => {
         .header-actions {
           display: flex;
           align-items: center;
-          gap: 2rem;
+          gap: 0.5rem;
         }
 
         .icon-btn-admin {
           background: var(--bg-offset);
           border: none;
-          padding: 0.8rem;
+          padding: 0.5rem;
           border-radius: 12px;
           color: var(--secondary);
           cursor: pointer;
@@ -1874,8 +2169,8 @@ const Admin = () => {
         }
 
         .admin-avatar {
-          width: 40px;
-          height: 40px;
+          width: 34px;
+          height: 34px;
           background: var(--accent);
           color: var(--secondary);
           border-radius: 50%;
@@ -1883,6 +2178,75 @@ const Admin = () => {
           align-items: center;
           justify-content: center;
           font-weight: 800;
+        }
+
+        .profile-dropdown {
+          position: absolute;
+          top: calc(100% + 15px);
+          right: 0;
+          width: 200px;
+          background: white;
+          border-radius: 20px;
+          padding: 1.2rem;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+          border: 1px solid var(--glass-border);
+          z-index: 1000;
+          text-align: left;
+        }
+
+        .dropdown-header {
+          padding: 0 0.5rem 0.5rem 0.5rem;
+        }
+
+        .user-name {
+          font-weight: 700;
+          color: var(--secondary);
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.2;
+        }
+
+        .user-role {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          margin: 4px 0 0 0;
+        }
+
+        .dropdown-divider {
+          height: 1px;
+          background: #f1f5f9;
+          margin: 1rem 0;
+        }
+
+        .dropdown-item {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          padding: 0.7rem 0.8rem;
+          border: none;
+          background: transparent;
+          color: var(--text);
+          font-weight: 600;
+          font-size: 0.85rem;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+          background: #f8fafc;
+          color: var(--primary);
+          transform: translateX(5px);
+        }
+
+        .dropdown-item.logout-item {
+          color: #ef4444;
+        }
+
+        .dropdown-item.logout-item:hover {
+          background: #fef2f2;
+          color: #ef4444;
         }
 
         .admin-content {
@@ -2013,10 +2377,30 @@ const Admin = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 1.2rem;
+          padding: 1rem 1.2rem;
           background: var(--bg-offset);
           border-radius: 16px;
           border: 1px solid var(--glass-border);
+          transition: all 0.3s ease;
+        }
+
+        .control-item:hover {
+          background: white;
+          box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+          transform: translateY(-2px);
+        }
+
+        .control-label {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          color: var(--secondary);
+          font-weight: 600;
+          font-size: 0.95rem;
+        }
+
+        .control-label svg {
+          color: var(--accent);
         }
 
         .toggle-btn {

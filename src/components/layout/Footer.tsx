@@ -45,7 +45,7 @@ const Footer = () => {
             <h4>{t('reach_out')}</h4>
             <ul>
               <li><Link to="/donate">{t('donate_now') || t('nav_donate')}</Link></li>
-              <li><Link to="/volunteer">{t('nav_volunteer')}</Link></li>
+              <li><Link to="/store">Temple Store</Link></li>
               <li><Link to="/contact">{t('nav_contact')}</Link></li>
               <li><Link to="/faq">{t('nav_faq')}</Link></li>
               <li><Link to="/privacy">{t('nav_privacy')}</Link></li>

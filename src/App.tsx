@@ -16,6 +16,7 @@ import Language from './pages/Language';
 import Account from './pages/Account';
 import AdminPanel from './pages/AdminPanel';
 import Help from './pages/Help';
+import Store from './pages/Store';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -84,6 +85,7 @@ function App() {
             <Route path="/language" element={<Language />} />
             <Route path="/account" element={<Account />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/store" element={<Store />} />
           </Routes>
         </main>
         <Footer />
