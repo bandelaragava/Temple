@@ -7,9 +7,10 @@ interface Props {
   onBack: () => void;
   onAddToCart: (p: Product, qty: number) => void;
   onBuyNow: (p: Product, qty: number) => void;
+  cartQty?: number;
 }
 
-const ProductDetail: React.FC<Props> = ({ product, onBack, onAddToCart, onBuyNow }) => {
+const ProductDetail: React.FC<Props> = ({ product, onBack, onAddToCart, onBuyNow, cartQty = 0 }) => {
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
@@ -82,6 +83,12 @@ const ProductDetail: React.FC<Props> = ({ product, onBack, onAddToCart, onBuyNow
             </div>
             <span className="pd-subtotal">Subtotal: ₹{product.price * qty}</span>
           </div>
+
+          {cartQty > 0 && (
+            <div className="pd-cart-notice">
+              🙏 Currently <strong>{cartQty}</strong> of this sacred item {cartQty === 1 ? 'is' : 'are'} in your cart.
+            </div>
+          )}
 
           <div className="pd-actions">
             <button className={`pd-btn-cart ${added ? 'added' : ''}`} onClick={handleAdd}>
@@ -217,6 +224,19 @@ const ProductDetail: React.FC<Props> = ({ product, onBack, onAddToCart, onBuyNow
           color: var(--secondary);
           background: var(--marble);
           padding: 0.4rem 0.8rem; border-radius: 8px;
+        }
+        .pd-cart-notice {
+          font-size: 0.85rem;
+          color: #2e7d32;
+          background: #e8f5e9;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          border-left: 3px solid #2e7d32;
+          font-weight: 600;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          width: fit-content;
         }
 
         .pd-actions { display: flex; gap: 1rem; flex-wrap: wrap; }

@@ -2741,6 +2741,14 @@ const Admin = () => {
             cursor: pointer;
           }
 
+          /* Mobile Responsiveness for Notification Dropdown on S and M Mobile */
+          @media (max-width: 480px) {
+            .admin-notification-dropdown {
+              width: 260px !important;
+              right: -50px !important;
+            }
+          }
+
       `}</style>
     </div>
   );

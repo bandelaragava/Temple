@@ -66,11 +66,10 @@ const Navbar = () => {
               <AnimatePresence>
                 {isNoteMenuOpen && (
                   <motion.div 
-                    className="profile-dropdown glass-card"
+                    className="profile-dropdown notification-dropdown-user glass-card"
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    style={{ width: '300px' }}
                   >
                     <div className="dropdown-header">
                       <span>Recent Notifications</span>
@@ -359,6 +358,10 @@ const Navbar = () => {
           z-index: 1001;
         }
 
+        .notification-dropdown-user {
+          width: 300px;
+        }
+
         .dropdown-item {
           display: flex;
           align-items: center;
@@ -458,6 +461,14 @@ const Navbar = () => {
         }
 
         @media (max-width: 992px) {
+        }
+
+        /* Mobile Responsiveness for Notification Dropdown on S and M Mobile */
+        @media (max-width: 480px) {
+          .notification-dropdown-user {
+            width: 260px !important;
+            right: -60px !important;
+          }
         }
       `}</style>
     </nav>

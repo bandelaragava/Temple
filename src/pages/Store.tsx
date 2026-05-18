@@ -44,19 +44,19 @@ const Store: React.FC = () => {
 
   const addToCart = useCallback((product: Product, qty = 1) => {
     setCart(prev => {
-      const existing = prev.find(i => i.id === product.id);
-      if (existing) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + qty } : i);
+      const existing = prev.find(i => i.id == product.id);
+      if (existing) return prev.map(i => i.id == product.id ? { ...i, qty: i.qty + qty } : i);
       return [...prev, { ...product, qty }];
     });
   }, []);
 
   const updateQty = useCallback((id: number, qty: number) => {
-    if (qty < 1) { setCart(prev => prev.filter(i => i.id !== id)); return; }
-    setCart(prev => prev.map(i => i.id === id ? { ...i, qty } : i));
+    if (qty < 1) { setCart(prev => prev.filter(i => i.id != id)); return; }
+    setCart(prev => prev.map(i => i.id == id ? { ...i, qty } : i));
   }, []);
 
   const removeItem = useCallback((id: number) => {
-    setCart(prev => prev.filter(i => i.id !== id));
+    setCart(prev => prev.filter(i => i.id != id));
   }, []);
 
   const viewDetails = useCallback((p: Product) => {
@@ -213,6 +213,8 @@ const Store: React.FC = () => {
                         product={product}
                         onAddToCart={p => addToCart(p)}
                         onViewDetails={viewDetails}
+                        cartQty={cart.find(item => item.id == product.id)?.qty || 0}
+                        onUpdateQty={updateQty}
                       />
                     ))}
                   </div>
@@ -244,9 +246,20 @@ const Store: React.FC = () => {
                         <p>{p.shortDesc}</p>
                         <div className="sf-footer">
                           <span className="sf-price">₹{p.price}</span>
-                          <button className="sf-btn" onClick={e => { e.stopPropagation(); addToCart(p); }}>
-                            <ShoppingCart size={14}/> Add
-                          </button>
+                          {(() => {
+                            const cartQty = cart.find(item => item.id == p.id)?.qty || 0;
+                            return cartQty > 0 ? (
+                              <div className="sf-qty-ctrl" onClick={e => e.stopPropagation()}>
+                                <button onClick={() => updateQty(p.id, cartQty - 1)}>−</button>
+                                <span>{cartQty}</span>
+                                <button onClick={() => updateQty(p.id, cartQty + 1)}>+</button>
+                              </div>
+                            ) : (
+                              <button className="sf-btn" onClick={e => { e.stopPropagation(); addToCart(p); }}>
+                                <ShoppingCart size={14}/> Add
+                              </button>
+                            );
+                          })()}
                         </div>
                       </div>
                     </div>
@@ -267,6 +280,7 @@ const Store: React.FC = () => {
                 onBack={() => setView('shop')}
                 onAddToCart={(p, qty) => addToCart(p, qty)}
                 onBuyNow={handleBuyNow}
+                cartQty={cart.find(item => item.id == selectedProduct.id)?.qty || 0}
               />
             </motion.div>
           )}
@@ -534,6 +548,39 @@ const Store: React.FC = () => {
           cursor: pointer; transition: transform 0.2s;
         }
         .sf-btn:hover { transform: scale(1.06); }
+        .sf-qty-ctrl {
+          display: flex;
+          align-items: center;
+          border: 1.5px solid var(--glass-border);
+          border-radius: 30px;
+          overflow: hidden;
+          background: var(--marble);
+        }
+        .sf-qty-ctrl button {
+          width: 26px;
+          height: 26px;
+          font-size: 0.9rem;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          font-weight: 700;
+          color: var(--secondary);
+          transition: background 0.2s, color 0.2s;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .sf-qty-ctrl button:hover {
+          background: var(--primary);
+          color: white;
+        }
+        .sf-qty-ctrl span {
+          min-width: 26px;
+          text-align: center;
+          font-weight: 700;
+          font-size: 0.85rem;
+          color: var(--secondary);
+        }
 
         /* ── Floating Cart ── */
         .floating-cart {

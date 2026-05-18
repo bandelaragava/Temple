@@ -6,9 +6,11 @@ interface Props {
   product: Product;
   onAddToCart: (p: Product) => void;
   onViewDetails: (p: Product) => void;
+  cartQty?: number;
+  onUpdateQty?: (id: number, qty: number) => void;
 }
 
-const ProductCard: React.FC<Props> = ({ product, onAddToCart, onViewDetails }) => (
+const ProductCard: React.FC<Props> = ({ product, onAddToCart, onViewDetails, cartQty = 0, onUpdateQty }) => (
   <div className="sp-card" onClick={() => onViewDetails(product)}>
     {product.badge && <span className="sp-badge">{product.badge}</span>}
     <div className="sp-img" style={{ background: product.image ? 'white' : product.gradient }}>
@@ -34,14 +36,22 @@ const ProductCard: React.FC<Props> = ({ product, onAddToCart, onViewDetails }) =
             <span className="sp-price-old">₹{product.originalPrice}</span>
           )}
         </div>
-        <button
-          className="sp-btn-cart"
-          onClick={e => { e.stopPropagation(); onAddToCart(product); }}
-          title="Add to Cart"
-        >
-          <ShoppingCart size={16} />
-          <span>Add</span>
-        </button>
+        {cartQty > 0 ? (
+          <div className="sp-qty-ctrl" onClick={e => e.stopPropagation()}>
+            <button onClick={() => onUpdateQty && onUpdateQty(product.id, cartQty - 1)}>−</button>
+            <span>{cartQty}</span>
+            <button onClick={() => onUpdateQty && onUpdateQty(product.id, cartQty + 1)}>+</button>
+          </div>
+        ) : (
+          <button
+            className="sp-btn-cart"
+            onClick={e => { e.stopPropagation(); onAddToCart(product); }}
+            title="Add to Cart"
+          >
+            <ShoppingCart size={16} />
+            <span>Add</span>
+          </button>
+        )}
       </div>
       <button className="sp-btn-buy" onClick={e => { e.stopPropagation(); onViewDetails(product); }}>
         <Zap size={14} /> View Details
@@ -173,6 +183,39 @@ const ProductCard: React.FC<Props> = ({ product, onAddToCart, onViewDetails }) =
       .sp-btn-cart:hover {
         transform: scale(1.05);
         box-shadow: 0 6px 18px rgba(255,153,51,0.4);
+      }
+      .sp-qty-ctrl {
+        display: flex;
+        align-items: center;
+        border: 1.5px solid var(--glass-border);
+        border-radius: 30px;
+        overflow: hidden;
+        background: var(--marble);
+      }
+      .sp-qty-ctrl button {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        font-weight: 700;
+        color: var(--secondary);
+        transition: background 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .sp-qty-ctrl button:hover {
+        background: var(--primary);
+        color: white;
+      }
+      .sp-qty-ctrl span {
+        min-width: 28px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 0.95rem;
+        color: var(--secondary);
       }
       .sp-btn-buy {
         display: flex;
