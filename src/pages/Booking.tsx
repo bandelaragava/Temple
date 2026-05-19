@@ -43,6 +43,55 @@ const Booking = () => {
   const [idNumber, setIdNumber] = useState('');
   const [idError, setIdError] = useState('');
   const [pilgrimName, setPilgrimName] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const [bookingConfig, setBookingConfig] = useState(() => {
+    const saved = localStorage.getItem('bookingConfig');
+    return saved ? JSON.parse(saved) : {
+      advanceDays: 15,
+      disabledDates: [],
+      slots: [
+        { id: 'morning', label: '06:00 AM - 08:00 AM', capacity: 100, booked: 45, isActive: true },
+        { id: 'late-morning', label: '08:30 AM - 10:30 AM', capacity: 150, booked: 10, isActive: true },
+        { id: 'noon', label: '11:00 AM - 01:00 PM', capacity: 200, booked: 200, isActive: true },
+        { id: 'evening', label: '04:00 PM - 06:00 PM', capacity: 100, booked: 100, isActive: false }
+      ]
+    };
+  });
+
+  const handleConfirmBooking = () => {
+    setIsProcessing(true);
+
+    setTimeout(() => {
+      // 1. Update the Quota count
+      const newConfig = { ...bookingConfig };
+      const slotIndex = newConfig.slots.findIndex((s: any) => s.id === selectedSlot);
+      
+      if (slotIndex >= 0) {
+        newConfig.slots[slotIndex].booked += 1;
+        setBookingConfig(newConfig);
+        localStorage.setItem('bookingConfig', JSON.stringify(newConfig));
+      }
+
+      // 2. Add to Admin Bookings array
+      const savedBookings = localStorage.getItem('bookings');
+      const adminBookings = savedBookings ? JSON.parse(savedBookings) : [];
+      
+      const newBooking = {
+        id: `BK${Math.floor(10000 + Math.random() * 90000)}`,
+        name: pilgrimName,
+        seva: bookingTypes.find(t => t.id === selectedType)?.title || 'Sarva Darshan',
+        date: `${selectedDate} ${today.toLocaleString('default', { month: 'short' })} ${today.getFullYear()}`,
+        slot: newConfig.slots.find((s: any) => s.id === selectedSlot)?.label || '06:00 AM',
+        status: 'Confirmed'
+      };
+      
+      localStorage.setItem('bookings', JSON.stringify([newBooking, ...adminBookings]));
+
+      setIsProcessing(false);
+      setStep(4);
+    }, 2000);
+  };
 
   // Verhoeff Algorithm for Aadhar Checksum
   const verhoeffTable = [
@@ -242,16 +291,19 @@ const Booking = () => {
               <div className="form-group">
                 <label><Calendar size={18} /> {t('label_select_date')}</label>
                 <div className="date-slots">
-                  {Array.from({ length: 15 }, (_, i) => {
+                  {Array.from({ length: bookingConfig.advanceDays }, (_, i) => {
                     const date = new Date();
                     date.setDate(today.getDate() + i);
                     const d = date.getDate();
                     const dayName = date.toLocaleString('default', { weekday: 'short' });
+                    const dateStr = date.toISOString().split('T')[0];
+                    const isDisabled = bookingConfig.disabledDates.includes(dateStr);
+                    
                     return (
                       <div
                         key={`${d}-${i}`}
-                        className={`date-slot ${selectedDate === d ? 'selected' : ''}`}
-                        onClick={() => setSelectedDate(d)}
+                        className={`date-slot ${selectedDate === d ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                        onClick={() => !isDisabled && setSelectedDate(d)}
                       >
                         <span className="day">{dayName}</span>
                         <span className="date">{d}</span>
@@ -263,19 +315,27 @@ const Booking = () => {
               <div className="form-group">
                 <label><Clock size={18} /> {t('label_available_slots')}</label>
                 <div className="time-slots">
-                  <button
-                    className={`slot-btn ${selectedSlot === 'morning' ? 'active' : ''}`}
-                    onClick={() => { setSelectedSlot('morning'); }}
-                  >06:00 AM - 08:00 AM</button>
-                  <button
-                    className={`slot-btn ${selectedSlot === 'late-morning' ? 'active' : ''}`}
-                    onClick={() => { setSelectedSlot('late-morning'); }}
-                  >08:30 AM - 10:30 AM</button>
-                  <button
-                    className={`slot-btn ${selectedSlot === 'noon' ? 'active' : ''}`}
-                    onClick={() => { setSelectedSlot('noon'); }}
-                  >11:00 AM - 01:00 PM</button>
-                  <button className="slot-btn disabled">04:00 PM - 06:00 PM ({t('label_full') || 'Full'})</button>
+                  {bookingConfig.slots.filter((s: any) => s.isActive).map((slot: any) => {
+                     const isFull = slot.booked >= slot.capacity;
+                     const remaining = slot.capacity - slot.booked;
+                     return (
+                        <button
+                          key={slot.id}
+                          className={`slot-btn ${selectedSlot === slot.id ? 'active' : ''} ${isFull ? 'disabled' : ''}`}
+                          onClick={() => { if (!isFull) setSelectedSlot(slot.id); }}
+                        >
+                          <div style={{ marginBottom: '4px' }}>{slot.label}</div>
+                          <div style={{ 
+                            fontSize: '0.75rem', 
+                            opacity: isFull ? 0.6 : 0.9, 
+                            color: isFull ? 'inherit' : (selectedSlot === slot.id ? 'white' : 'var(--primary)'),
+                            fontWeight: selectedSlot === slot.id ? 600 : 500
+                          }}>
+                            {isFull ? (t('label_full') || 'Quota Full') : `${remaining} tickets left`}
+                          </div>
+                        </button>
+                     );
+                  })}
                 </div>
               </div>
               
@@ -311,12 +371,29 @@ const Booking = () => {
               <div className="summary-row">
                 <span>{t('table_timing')}:</span> 
                 <strong>
-                  {selectedSlot === 'morning' ? '06:00 AM' : 
-                   selectedSlot === 'late-morning' ? '08:30 AM' : 
-                   selectedSlot === 'noon' ? '11:00 AM' : '08:30 AM'}
+                  {bookingConfig.slots.find((s: any) => s.id === selectedSlot)?.label || '06:00 AM'}
                 </strong>
               </div>
               <div className="summary-row total"><span>{t('total_contribution')}:</span> <strong>₹501.00</strong></div>
+            </div>
+          </div>
+        );
+      case 4:
+        return (
+          <div className="booking-summary text-center">
+            <div className="success-icon" style={{ marginBottom: '1.5rem' }}>
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200, damping: 15 }}>
+                <CheckCircle size={80} color="#2ecc71" />
+              </motion.div>
+            </div>
+            <h2 style={{ color: '#2ecc71', marginBottom: '1rem' }}>Booking Confirmed!</h2>
+            <p className="summary-desc" style={{ marginBottom: '2rem', fontSize: '1.1rem' }}>
+              Your Darshan has been successfully booked. You will receive an SMS confirmation shortly.
+            </p>
+            <div className="form-actions">
+               <button className="btn-primary" onClick={() => window.location.href = '/account'} style={{ padding: '0.8rem 2rem' }}>
+                 View My Bookings
+               </button>
             </div>
           </div>
         );
@@ -345,17 +422,22 @@ const Booking = () => {
         </motion.div>
 
         <div className="booking-footer">
-          {step > 1 && (
-            <button className="btn-secondary" onClick={() => setStep(step - 1)}>
+          {step > 1 && step < 4 && (
+            <button className="btn-secondary" onClick={() => setStep(step - 1)} disabled={isProcessing}>
               <ArrowLeft size={20} /> {t('btn_back')}
             </button>
           )}
           {step === 3 && (
             <button
               className="btn-primary"
-              onClick={() => alert(t('alert_payment_redirect'))}
+              onClick={handleConfirmBooking}
+              disabled={isProcessing}
             >
-              {t('btn_proceed')} <ArrowRight size={20} />
+              {isProcessing ? (
+                <>Processing Payment... <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1, ease: 'linear' }} style={{ display: 'inline-block', marginLeft: '0.5rem' }}>⟳</motion.div></>
+              ) : (
+                <>{t('btn_proceed')} <ArrowRight size={20} /></>
+              )}
             </button>
           )}
         </div>

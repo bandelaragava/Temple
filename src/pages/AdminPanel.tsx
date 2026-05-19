@@ -244,6 +244,20 @@ const Admin = () => {
     return saved ? JSON.parse(saved) : PRODUCTS;
   });
 
+  const [bookingConfig, setBookingConfig] = useState(() => {
+    const saved = localStorage.getItem('bookingConfig');
+    return saved ? JSON.parse(saved) : {
+      advanceDays: 15,
+      disabledDates: [],
+      slots: [
+        { id: 'morning', label: '06:00 AM - 08:00 AM', capacity: 100, booked: 45, isActive: true },
+        { id: 'late-morning', label: '08:30 AM - 10:30 AM', capacity: 150, booked: 10, isActive: true },
+        { id: 'noon', label: '11:00 AM - 01:00 PM', capacity: 200, booked: 200, isActive: true },
+        { id: 'evening', label: '04:00 PM - 06:00 PM', capacity: 100, booked: 100, isActive: false }
+      ]
+    };
+  });
+
   // Generic save handler
   const saveToCMS = (key: string, data: any) => {
     localStorage.setItem(key, JSON.stringify(data));
@@ -274,6 +288,19 @@ const Admin = () => {
     localStorage.setItem('registeredUsers', JSON.stringify(updated));
     setActiveModal(null);
     setSaveStatus('Devotee added successfully!');
+    setTimeout(() => setSaveStatus(null), 3000);
+  };
+
+  const handleEditUser = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email) return;
+    const updated = registeredUsers.map((u: any) => 
+      u.email === formData.originalEmail ? { ...u, name: formData.name, email: formData.email } : u
+    );
+    setRegisteredUsers(updated);
+    localStorage.setItem('registeredUsers', JSON.stringify(updated));
+    setActiveModal(null);
+    setSaveStatus('Devotee details updated!');
     setTimeout(() => setSaveStatus(null), 3000);
   };
 
@@ -344,9 +371,14 @@ const Admin = () => {
   };
 
   const handleUpdateAdminKey = (newKey: string) => {
-    if (newKey.length < 6) return alert('Key must be at least 6 characters.');
+    if (newKey.length < 6) {
+      setSaveStatus('Key must be at least 6 characters.');
+      setTimeout(() => setSaveStatus(null), 3000);
+      return;
+    }
     setAdminKey(newKey);
-    alert('Admin Security Key updated successfully!');
+    setSaveStatus('Admin Security Key updated successfully!');
+    setTimeout(() => setSaveStatus(null), 3000);
   };
 
   const handleExportDonations = () => {
@@ -637,17 +669,17 @@ const Admin = () => {
                 <button onClick={() => setActiveModal(null)}><X size={20} /></button>
               </div>
 
-              <form onSubmit={activeModal === 'user' ? handleAddUser : activeModal === 'seva' ? handleAddSeva : handleAddFestival}>
+              <form onSubmit={activeModal === 'user' ? handleAddUser : activeModal === 'editUser' ? handleEditUser : activeModal === 'seva' ? handleAddSeva : handleAddFestival}>
                 <div className="modal-body-admin">
-                  {activeModal === 'user' && (
+                  {(activeModal === 'user' || activeModal === 'editUser') && (
                     <>
                       <div className="form-group">
                         <label>Full Name</label>
-                        <input type="text" required onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Srinivasa Rao" />
+                        <input type="text" required value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} placeholder="e.g. Srinivasa Rao" />
                       </div>
                       <div className="form-group">
                         <label>Email Address</label>
-                        <input type="email" required onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="devotee@example.com" />
+                        <input type="email" required value={formData.email || ''} onChange={e => setFormData({ ...formData, email: e.target.value })} placeholder="devotee@example.com" />
                       </div>
                     </>
                   )}
@@ -944,7 +976,10 @@ const Admin = () => {
                         </div>
                         <button
                           className="toggle-btn on"
-                          onClick={() => alert('Live stream control updated.')}
+                          onClick={() => {
+                            setSaveStatus('Live stream control updated.');
+                            setTimeout(() => setSaveStatus(null), 3000);
+                          }}
                         >
                           <ToggleRight size={32} />
                         </button>
@@ -1043,7 +1078,10 @@ const Admin = () => {
                           <td><span className="status-badge active">Active</span></td>
                           <td>
                             <div className="row-actions">
-                              <button title="Edit" onClick={() => alert('Edit feature is being updated for security.')}><Edit2 size={16} /></button>
+                              <button title="Edit" onClick={() => {
+                                setFormData({ originalEmail: user.email, name: user.name, email: user.email });
+                                setActiveModal('editUser');
+                              }}><Edit2 size={16} /></button>
                               <button
                                 title="Delete"
                                 className="delete"
@@ -1066,14 +1104,19 @@ const Admin = () => {
               <motion.div key="bookings" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <div className="section-header-admin">
                   <h2>Darshan Bookings</h2>
-                  <div className="date-picker-wrapper">
-                    <Calendar size={18} className="picker-icon" />
-                    <input
-                      type="date"
-                      className="admin-date-picker"
-                      value={filterDate}
-                      onChange={(e) => setFilterDate(e.target.value)}
-                    />
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div className="date-picker-wrapper">
+                      <Calendar size={18} className="picker-icon" />
+                      <input
+                        type="date"
+                        className="admin-date-picker"
+                        value={filterDate}
+                        onChange={(e) => setFilterDate(e.target.value)}
+                      />
+                    </div>
+                    <button className="btn-primary" onClick={() => saveToCMS('bookings', bookings)}>
+                      <Save size={18} /> Update Bookings
+                    </button>
                   </div>
                 </div>
                 <div className="user-table-container glass-card">
@@ -1096,27 +1139,25 @@ const Admin = () => {
                             <td>{booking.name}</td>
                             <td>{booking.seva}</td>
                             <td>{booking.date} | {booking.slot}</td>
-                            <td><span className={`status-badge ${booking.status.toLowerCase()}`}>{booking.status}</span></td>
+                            <td>
+                              <select 
+                                value={booking.status}
+                                onChange={(e) => {
+                                  const newBookings = bookings.map((b: any) => 
+                                    b.id === booking.id ? { ...b, status: e.target.value } : b
+                                  );
+                                  setBookings(newBookings);
+                                }}
+                                className={`status-badge ${booking.status.toLowerCase()}`}
+                                style={{ background: 'rgba(0,0,0,0.2)', border: 'none', color: 'inherit', padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem', cursor: 'pointer', outline: 'none' }}
+                              >
+                                <option value="Pending" style={{ color: 'black' }}>Pending</option>
+                                <option value="Confirmed" style={{ color: 'black' }}>Confirmed</option>
+                                <option value="Cancelled" style={{ color: 'black' }}>Cancelled</option>
+                              </select>
+                            </td>
                             <td>
                               <div className="row-actions">
-                                {booking.status === 'Pending' && (
-                                  <>
-                                    <button
-                                      className="approve"
-                                      onClick={() => handleUpdateBookingStatus(booking.id, 'Confirmed')}
-                                      title="Approve"
-                                    >
-                                      <CheckCircle2 size={16} />
-                                    </button>
-                                    <button
-                                      className="delete"
-                                      onClick={() => handleUpdateBookingStatus(booking.id, 'Cancelled')}
-                                      title="Reject"
-                                    >
-                                      <XCircle size={16} />
-                                    </button>
-                                  </>
-                                )}
                                 <button onClick={() => setSelectedBooking(booking)} title="View Details"><Eye size={16} /></button>
                               </div>
                             </td>
@@ -1131,6 +1172,72 @@ const Admin = () => {
                       )}
                     </tbody>
                   </table>
+                </div>
+              </motion.div>
+            )}
+
+            {activeSection === 'bookings' && (
+              <motion.div key="bookingConfig" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ marginTop: '2rem' }}>
+                <div className="section-header-admin">
+                  <h2>Booking Quotas & Slots</h2>
+                  <button className="btn-primary" onClick={() => saveToCMS('bookingConfig', bookingConfig)}>
+                    <Save size={18} /> Update
+                  </button>
+                </div>
+                {saveStatus && (
+                  <div className="save-notification">
+                    <CheckCircle2 size={18} /> {saveStatus}
+                  </div>
+                )}
+                <div className="glass-card" style={{ padding: '2rem' }}>
+                  <div className="form-group" style={{ marginBottom: '2rem', maxWidth: '300px' }}>
+                    <label>Advance Booking Days (Dates visible)</label>
+                    <input 
+                      type="number" 
+                      value={bookingConfig.advanceDays} 
+                      onChange={(e) => setBookingConfig({...bookingConfig, advanceDays: parseInt(e.target.value) || 1})} 
+                      style={{ padding: '0.5rem', width: '100%', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                  </div>
+                  <h3>Manage Time Slots</h3>
+                  <div className="slots-manager" style={{ display: 'grid', gap: '1rem', marginTop: '1rem' }}>
+                    {bookingConfig.slots.map((slot: any, idx: number) => (
+                      <div key={slot.id} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr auto', gap: '1rem', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px' }}>
+                        <div>
+                          <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Slot Time</label>
+                          <input type="text" value={slot.label} onChange={(e) => {
+                            const newSlots = [...bookingConfig.slots];
+                            newSlots[idx].label = e.target.value;
+                            setBookingConfig({...bookingConfig, slots: newSlots});
+                          }} style={{ width: '100%', padding: '0.4rem' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Total Quota</label>
+                          <input type="number" value={slot.capacity} onChange={(e) => {
+                            const newSlots = [...bookingConfig.slots];
+                            newSlots[idx].capacity = parseInt(e.target.value) || 0;
+                            setBookingConfig({...bookingConfig, slots: newSlots});
+                          }} style={{ width: '100%', padding: '0.4rem' }} />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Tickets Booked</label>
+                          <input type="number" value={slot.booked} onChange={(e) => {
+                            const newSlots = [...bookingConfig.slots];
+                            newSlots[idx].booked = parseInt(e.target.value) || 0;
+                            setBookingConfig({...bookingConfig, slots: newSlots});
+                          }} style={{ width: '100%', padding: '0.4rem' }} />
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                           <label style={{ fontSize: '0.8rem', opacity: 0.8 }}>Active</label>
+                           <input type="checkbox" checked={slot.isActive} onChange={(e) => {
+                             const newSlots = [...bookingConfig.slots];
+                             newSlots[idx].isActive = e.target.checked;
+                             setBookingConfig({...bookingConfig, slots: newSlots});
+                           }} style={{ width: '20px', height: '20px' }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             )}

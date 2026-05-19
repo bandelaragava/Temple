@@ -6,6 +6,26 @@ import { useTranslation } from 'react-i18next';
 const Help = () => {
   const { t } = useTranslation();
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
+  const [isSending, setIsSending] = useState(false);
+  const [isSent, setIsSent] = useState(false);
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSending(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSending(false);
+      setIsSent(true);
+      
+      // Reset form after 4 seconds
+      setTimeout(() => {
+        setIsSent(false);
+        const form = e.target as HTMLFormElement;
+        form.reset();
+      }, 4000);
+    }, 1200);
+  };
 
   const faqs = [
     {
@@ -85,15 +105,27 @@ const Help = () => {
               </div>
             </div>
 
-            <div className="message-box glass-card mt-3">
+            <div className="message-box glass-card">
               <h3>Send a Message</h3>
-              <form className="mini-contact-form">
-                <input type="text" placeholder="Subject" />
-                <textarea placeholder="Describe your issue..."></textarea>
-                <button type="button" className="btn-primary w-full" onClick={() => alert('Message Sent! We will contact you soon.')}>
-                  <span>Send Message</span>
-                  <Send size={16} />
-                </button>
+              <form className="mini-contact-form" onSubmit={handleSendMessage}>
+                <input type="text" placeholder="Subject" required disabled={isSending || isSent} />
+                <textarea placeholder="Describe your issue..." required disabled={isSending || isSent}></textarea>
+                
+                {isSent ? (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="success-message"
+                  >
+                    <div className="success-icon">✓</div>
+                    <span>Message sent successfully!</span>
+                  </motion.div>
+                ) : (
+                  <button type="submit" className="btn-primary w-full" disabled={isSending}>
+                    <span>{isSending ? 'Sending...' : 'Send Message'}</span>
+                    {!isSending && <Send size={16} />}
+                  </button>
+                )}
               </form>
             </div>
           </div>
@@ -140,6 +172,16 @@ const Help = () => {
           line-height: 1.6;
         }
 
+        .contact-sidebar {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .contact-card, .message-box {
+          padding: 2rem;
+        }
+
         .contact-methods {
           display: flex;
           flex-direction: column;
@@ -179,11 +221,47 @@ const Help = () => {
           border: 1px solid rgba(0,0,0,0.1);
           background: var(--marble);
           outline: none;
+          transition: var(--transition);
+        }
+
+        .mini-contact-form input:disabled, .mini-contact-form textarea:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
         }
 
         .mini-contact-form textarea {
           height: 120px;
           resize: none;
+        }
+
+        .success-message {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.8rem;
+          background: rgba(39, 174, 96, 0.1);
+          color: #27ae60;
+          border-radius: 8px;
+          font-weight: 600;
+          border: 1px solid rgba(39, 174, 96, 0.2);
+        }
+
+        .success-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 20px;
+          height: 20px;
+          background: #27ae60;
+          color: white;
+          border-radius: 50%;
+          font-size: 12px;
+        }
+
+        .w-full {
+          width: 100%;
+          justify-content: center;
         }
 
         @media (max-width: 992px) {

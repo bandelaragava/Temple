@@ -17,6 +17,8 @@ import Account from './pages/Account';
 import AdminPanel from './pages/AdminPanel';
 import Help from './pages/Help';
 import Store from './pages/Store';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -80,8 +82,8 @@ function App() {
             <Route path="/rituals" element={<Darshan />} />
             <Route path="/contact" element={<Help />} />
             <Route path="/faq" element={<Help />} />
-            <Route path="/privacy" element={<ComingSoon title="Privacy Policy" />} />
-            <Route path="/terms" element={<ComingSoon title="Terms of Service" />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             <Route path="/language" element={<Language />} />
             <Route path="/account" element={<Account />} />
             <Route path="/admin" element={<AdminPanel />} />
