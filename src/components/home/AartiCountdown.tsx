@@ -108,7 +108,7 @@ const AartiCountdown = () => {
           align-items: center;
           justify-content: space-between;
           padding: 2.5rem 3rem;
-          margin-top: -3rem;
+          margin-top: 2rem;
           margin-bottom: 0.5rem;
           position: relative;
           z-index: 10;

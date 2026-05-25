@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Lock, LogIn, UserPlus, Calendar, CreditCard, Clock, Bell, Settings, LogOut, ChevronRight, AlertCircle, Eye, EyeOff, HelpCircle, ChevronDown, Send, Phone, MessageSquare, X } from 'lucide-react';
+import { User, Mail, Lock, LogIn, UserPlus, Calendar, CreditCard, Clock, Bell, Settings, LogOut, ChevronRight, AlertCircle, Eye, EyeOff, HelpCircle, ChevronDown, Send, Phone, MessageSquare, X, Menu, Home } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 const Account = () => {
   const { t } = useTranslation();
@@ -18,13 +19,39 @@ const Account = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const mainContentRef = React.useRef<HTMLDivElement>(null);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+  const profileRef = React.useRef<HTMLDivElement>(null);
+
+  const handleNavClick = (tab: string) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false);
+  };
 
   React.useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTo({
+        top: 0,
+        behavior: 'instant'
+      });
+    }
     window.scrollTo({
       top: 0,
       behavior: 'instant'
     });
   }, [activeTab]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setShowProfileDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const [userData, setUserData] = useState(() => {
     const saved = localStorage.getItem('userData');
@@ -526,254 +553,347 @@ const Account = () => {
   }
 
   return (
-    <div className="dashboard-page section-padding" style={{ paddingTop: '150px' }}>
-      <div className="container">
-        <div className="dashboard-grid">
-          {/* Sidebar */}
-          <aside className="dashboard-sidebar">
-            <div className="user-profile glass-card">
-              <div className="avatar">
-                <User size={40} />
-              </div>
-              <h3>{userData.name}</h3>
-              <span>{t('dashboard_member_since')} {userData.memberSince}</span>
-            </div>
+    <div className={`admin-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
 
-            <nav className="dashboard-nav">
-              <button
-                className={`nav-item ${activeTab === 'bookings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('bookings')}
-              >
-                <Calendar size={18} /> {t('nav_my_bookings')}
-              </button>
-              <button
-                className={`nav-item ${activeTab === 'donate' ? 'active' : ''}`}
-                onClick={() => setActiveTab('donate')}
-              >
-                <CreditCard size={18} /> {t('nav_donate')}
-              </button>
-              <button
-                className={`nav-item ${activeTab === 'history' ? 'active' : ''}`}
-                onClick={() => setActiveTab('history')}
-              >
-                <Clock size={18} /> {t('nav_history')}
-              </button>
-              <button
-                className={`nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-                onClick={() => setActiveTab('notifications')}
-              >
-                <Bell size={18} /> {t('nav_notifications')}
-              </button>
-              <button
-                className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('settings')}
-              >
-                <Settings size={18} /> {t('nav_settings')}
-              </button>
-              <button
-                className={`nav-item ${activeTab === 'help' ? 'active' : ''}`}
-                onClick={() => setActiveTab('help')}
-              >
-                <HelpCircle size={18} /> Help & Support
-              </button>
-              <button className="nav-item logout" onClick={handleLogout}><LogOut size={18} /> {t('nav_sign_out')}</button>
-            </nav>
-          </aside>
 
-          {/* Main Content */}
-          <main className="dashboard-main">
-            <div className="welcome-header">
-              <h1>{t('dashboard_welcome')}, <span className="text-gradient">{userData.name.split(' ')[0]}</span></h1>
-              <p>{t('dashboard_welcome_desc')}</p>
-            </div>
+      {/* Sidebar Overlay for Mobile */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <motion.div
+            className="sidebar-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-            <div className="stats-grid">
-              <div className="stat-card glass-card">
-                <span className="label">{t('stat_upcoming_sevas')}</span>
-                <span className="value">2</span>
-              </div>
-              <div className="stat-card glass-card">
-                <span className="label">{t('stat_total_donations')}</span>
-                <span className="value">₹ 5,001</span>
-              </div>
-              <div className="stat-card glass-card">
-                <span className="label">{t('stat_reward_points')}</span>
-                <span className="value">450</span>
-              </div>
-            </div>
-
-            <section className="dashboard-section">
-              <div className="section-header">
-                <h2>
-                  {activeTab === 'bookings' ? t('nav_my_bookings') :
-                    activeTab === 'donate' ? t('nav_donate') :
-                      activeTab === 'history' ? t('nav_history') :
-                        activeTab === 'notifications' ? t('nav_notifications') :
-                          activeTab === 'help' ? 'Help & Support' :
-                            t('nav_settings')}
-                </h2>
-                <button className="text-btn" onClick={() => alert('Feature coming soon!')}>{t('label_view_all')} <ChevronRight size={16} /></button>
-              </div>
-
-              <div className="tab-content" style={{ marginTop: '1rem' }}>
-                {activeTab === 'bookings' && (
-                  <div className="bookings-list">
-                    {userData.recentBookings.map((booking: any) => (
-                      <div key={booking.id} className="booking-item glass-card">
-                        <div className="item-info">
-                          <h4>{booking.seva}</h4>
-                          <span>ID: {booking.id}</span>
-                        </div>
-                        <div className="item-date">
-                          <Calendar size={14} />
-                          {booking.date}
-                        </div>
-                        <div className={`item-status ${booking.status.toLowerCase()}`}>
-                          {booking.status === 'Confirmed' ? t('label_confirmed') : t('label_pending')}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {activeTab === 'donate' && (
-                  <div className="donations-list">
-                    <div className="section-header-mini mb-4">
-                      <h4>Recent Sacred Offerings</h4>
-                      <button className="btn-secondary" onClick={() => window.location.href = '/e-hundi'}>Donate Again</button>
-                    </div>
-                    {userData.donations.map((donation: any) => (
-                      <div key={donation.id} className="booking-item glass-card">
-                        <div className="item-info">
-                          <h4>{donation.purpose}</h4>
-                          <span>Transaction ID: {donation.id}</span>
-                        </div>
-                        <div className="item-date">
-                          <CreditCard size={14} />
-                          {donation.amount}
-                        </div>
-                        <div className="item-date">
-                          {donation.date}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {activeTab === 'notifications' && (
-                  <div className="notifications-list">
-                    {(userData?.notifications || []).map((note: any) => (
-                      <div key={note.id} className={`notification-item glass-card ${note.unread ? 'unread' : ''}`}>
-                        <div className="note-icon">
-                          <Bell size={20} />
-                        </div>
-                        <div className="note-content">
-                          <div className="note-header">
-                            <h4>{note.title}</h4>
-                            <span>{note.time}</span>
-                          </div>
-                          <p>{note.message}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {activeTab === 'settings' && (
-                  <div className="settings-panel glass-card">
-                    <h3>{t('label_edit_profile')}</h3>
-                    <div className="settings-grid">
-                      <div className="input-field">
-                        <label>Full Name</label>
-                        <input type="text" defaultValue={userData.name} />
-                      </div>
-                      <div className="input-field">
-                        <label>Mobile Number</label>
-                        <input type="text" defaultValue={userData.phone} />
-                      </div>
-                      <div className="input-field">
-                        <label>Email Address</label>
-                        <input type="email" defaultValue={userData.email} disabled />
-                      </div>
-                      <div className="input-field">
-                        <label>ID Proof (Aadhar/Voter ID)</label>
-                        <input type="text" defaultValue={userData.idProofNumber} />
-                      </div>
-                    </div>
-                    <button className="btn-primary mt-5" style={{ marginTop: '2rem' }} onClick={() => alert('Profile updated successfully!')}>
-                      Save Changes
-                    </button>
-                  </div>
-                )}
-
-                {activeTab === 'history' && (
-                  <div className="history-list">
-                    <div className="section-header-mini mb-4">
-                      <h4>Past Spiritual Journeys</h4>
-                    </div>
-                    <div className="history-items">
-                      {[
-                        { seva: 'Sahasra Deepalankara Seva', date: '2024-03-12', result: 'Completed' },
-                        { seva: 'Visesha Pooja', date: '2024-01-05', result: 'Completed' }
-                      ].map((item, i) => (
-                        <div key={i} className="history-item glass-card mb-3">
-                          <div className="item-info">
-                            <h4>{item.seva}</h4>
-                            <p>{item.date}</p>
-                          </div>
-                          <span className="status-badge active">{item.result}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {activeTab === 'help' && (
-                  <div className="help-panel">
-                    <div className="dashboard-help-grid">
-                      <div className="help-content">
-                        <h3>Frequently Asked Questions</h3>
-                        <div className="dashboard-faq">
-                          {[
-                            { q: "How to download my Darshan ticket?", a: "Once confirmed, you can view and download your ticket from the 'My Bookings' tab above." },
-                            { q: "ID proof verification failed?", a: "Ensure you are using the same ID proof number provided during the sacred booking process." },
-                            { q: "Payment issues for E-Hundi?", a: "Wait for 15 minutes for the status to update. If it fails, the amount will be refunded by your bank within 5-7 days." }
-                          ].map((item, i) => (
-                            <div key={i} className="faq-box glass-card mb-3">
-                              <h5 className="mb-2" style={{ color: 'var(--primary)' }}>{item.q}</h5>
-                              <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{item.a}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="help-sidebar">
-                        <div className="support-card glass-card">
-                          <h4>Need Live Help?</h4>
-                          <div className="support-links mt-3">
-                            <div className="link-item">
-                              <Phone size={16} /> <span>+91 877 1234567</span>
-                            </div>
-                            <div className="link-item">
-                              <Mail size={16} /> <span>help@govindaraja.in</span>
-                            </div>
-                          </div>
-                          <hr className="my-4" style={{ opacity: 0.1 }} />
-                          <button className="btn-primary w-full" onClick={() => setIsChatOpen(true)}>
-                            <MessageSquare size={16} /> Start Chat
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </section>
-          </main>
+      {/* Sidebar */}
+      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
+        <div className="sidebar-logo">
+          <img src="/logo.png" alt="Temple Logo" className="admin-logo-img" />
+          <span>Devotee Portal</span>
         </div>
-      </div>
+
+        <nav className="sidebar-nav">
+          <Link to="/" className="nav-btn home-nav-btn">
+            <Home size={18} /> Back to Website
+          </Link>
+          <div className="sidebar-divider"></div>
+          <button
+            className={`nav-btn ${activeTab === 'bookings' ? 'active' : ''}`}
+            onClick={() => handleNavClick('bookings')}
+          >
+            <Calendar size={18} /> {t('nav_my_bookings')}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'donate' ? 'active' : ''}`}
+            onClick={() => handleNavClick('donate')}
+          >
+            <CreditCard size={18} /> {t('nav_donate')}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'history' ? 'active' : ''}`}
+            onClick={() => handleNavClick('history')}
+          >
+            <Clock size={18} /> {t('nav_history')}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'notifications' ? 'active' : ''}`}
+            onClick={() => handleNavClick('notifications')}
+          >
+            <Bell size={18} /> {t('nav_notifications')}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => handleNavClick('settings')}
+          >
+            <Settings size={18} /> {t('nav_settings')}
+          </button>
+          <button
+            className={`nav-btn ${activeTab === 'help' ? 'active' : ''}`}
+            onClick={() => handleNavClick('help')}
+          >
+            <HelpCircle size={18} /> Help & Support
+          </button>
+          <div className="sidebar-divider"></div>
+          <button className="nav-btn logout" onClick={() => { handleLogout(); setIsSidebarOpen(false); }}>
+            <LogOut size={18} /> {t('nav_sign_out')}
+          </button>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="admin-main" ref={mainContentRef}>
+        <header className="admin-header">
+          <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)} aria-label="Toggle Sidebar">
+            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <div className="header-title">
+            <img src="/logo.png" alt="Logo" className="header-logo-img" />
+            <h2>
+              Sri Govindaraja Swamy Devasthanam
+            </h2>
+          </div>
+          <div className="header-actions">
+            <Link to="/" className="back-home-btn" title="Back to Main Website">
+              <Home size={18} />
+              <span>Home</span>
+            </Link>
+            <button 
+              className="header-action-btn" 
+              onClick={() => setActiveTab('notifications')}
+              title={t('nav_notifications')}
+            >
+              <Bell size={18} />
+              {userData.notes && userData.notes.filter((n: any) => n.unread).length > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '2px',
+                  right: '2px',
+                  width: '8px',
+                  height: '8px',
+                  background: 'var(--primary)',
+                  borderRadius: '50%',
+                  boxShadow: '0 0 10px var(--primary)'
+                }} />
+              )}
+            </button>
+            <div
+              className="admin-profile"
+              ref={profileRef}
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              style={{ cursor: 'pointer', position: 'relative', display: 'flex', alignItems: 'center' }}
+            >
+              <div className="admin-avatar" style={{ margin: 0 }}><User size={18} /></div>
+
+              <AnimatePresence>
+                {showProfileDropdown && (
+                  <motion.div
+                    className="profile-dropdown glass-card"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ position: 'absolute', top: 'calc(100% + 15px)', right: 0, zIndex: 1000 }}
+                  >
+                    <div className="dropdown-header">
+                      <div className="user-info">
+                        <p className="user-name" style={{ margin: 0, fontWeight: 700, fontSize: '0.9rem', color: 'var(--secondary)' }}>{userData.name}</p>
+                        <p className="user-role" style={{ margin: '4px 0 0 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>Devotee Member</p>
+                      </div>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <button className="dropdown-item" onClick={() => { setActiveTab('bookings'); setShowProfileDropdown(false); }}>
+                      <Calendar size={16} /> {t('nav_my_bookings')}
+                    </button>
+                    <button className="dropdown-item" onClick={() => { setActiveTab('settings'); setShowProfileDropdown(false); }}>
+                      <Settings size={16} /> {t('nav_settings')}
+                    </button>
+                    <div className="dropdown-divider"></div>
+                    <button className="dropdown-item logout-item" onClick={() => { handleLogout(); setShowProfileDropdown(false); }}>
+                      <LogOut size={16} /> {t('nav_sign_out')}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </header>
+
+        <div className="admin-content">
+          <div className="welcome-header">
+            <h1>{t('dashboard_welcome')}, <span className="text-gradient">{userData.name.split(' ')[0]}</span></h1>
+            <p>{t('dashboard_welcome_desc')}</p>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-card glass-card">
+              <span className="label">{t('stat_upcoming_sevas')}</span>
+              <span className="value">2</span>
+            </div>
+            <div className="stat-card glass-card">
+              <span className="label">{t('stat_total_donations')}</span>
+              <span className="value">₹ 5,001</span>
+            </div>
+            <div className="stat-card glass-card">
+              <span className="label">{t('stat_reward_points')}</span>
+              <span className="value">450</span>
+            </div>
+          </div>
+
+          <section className="dashboard-section">
+            <div className="section-header">
+              <h2>
+                {activeTab === 'bookings' ? t('nav_my_bookings') :
+                  activeTab === 'donate' ? t('nav_donate') :
+                    activeTab === 'history' ? t('nav_history') :
+                      activeTab === 'notifications' ? t('nav_notifications') :
+                        activeTab === 'help' ? 'Help & Support' :
+                          t('nav_settings')}
+              </h2>
+              <button className="text-btn" onClick={() => alert('Feature coming soon!')}>{t('label_view_all')} <ChevronRight size={16} /></button>
+            </div>
+
+            <div className="tab-content" style={{ marginTop: '1rem' }}>
+              {activeTab === 'bookings' && (
+                <div className="bookings-list">
+                  {userData.recentBookings.map((booking: any) => (
+                    <div key={booking.id} className="booking-item glass-card">
+                      <div className="item-info">
+                        <h4>{booking.seva}</h4>
+                        <span>ID: {booking.id}</span>
+                      </div>
+                      <div className="item-date">
+                        <Calendar size={14} />
+                        {booking.date}
+                      </div>
+                      <div className={`item-status ${booking.status.toLowerCase()}`}>
+                        {booking.status === 'Confirmed' ? t('label_confirmed') : t('label_pending')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {activeTab === 'donate' && (
+                <div className="donations-list">
+                  <div className="section-header-mini mb-4">
+                    <h4>Recent Sacred Offerings</h4>
+                    <button className="btn-secondary" onClick={() => window.location.href = '/e-hundi'}>Donate Again</button>
+                  </div>
+                  {userData.donations.map((donation: any) => (
+                    <div key={donation.id} className="booking-item glass-card">
+                      <div className="item-info">
+                        <h4>{donation.purpose}</h4>
+                        <span>Transaction ID: {donation.id}</span>
+                      </div>
+                      <div className="item-date">
+                        <CreditCard size={14} />
+                        {donation.amount}
+                      </div>
+                      <div className="item-date">
+                        {donation.date}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {activeTab === 'notifications' && (
+                <div className="notifications-list">
+                  {(userData?.notifications || []).map((note: any) => (
+                    <div key={note.id} className={`notification-item glass-card ${note.unread ? 'unread' : ''}`}>
+                      <div className="note-icon">
+                        <Bell size={20} />
+                      </div>
+                      <div className="note-content">
+                        <div className="note-header">
+                          <h4>{note.title}</h4>
+                          <span>{note.time}</span>
+                        </div>
+                        <p>{note.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'settings' && (
+                <div className="settings-panel glass-card">
+                  <h3>{t('label_edit_profile')}</h3>
+                  <div className="settings-grid">
+                    <div className="input-field">
+                      <label>Full Name</label>
+                      <input type="text" defaultValue={userData.name} />
+                    </div>
+                    <div className="input-field">
+                      <label>Mobile Number</label>
+                      <input type="text" defaultValue={userData.phone} />
+                    </div>
+                    <div className="input-field">
+                      <label>Email Address</label>
+                      <input type="email" defaultValue={userData.email} disabled />
+                    </div>
+                    <div className="input-field">
+                      <label>ID Proof (Aadhar/Voter ID)</label>
+                      <input type="text" defaultValue={userData.idProofNumber} />
+                    </div>
+                  </div>
+                  <button className="btn-primary mt-5" style={{ marginTop: '2rem' }} onClick={() => alert('Profile updated successfully!')}>
+                    Save Changes
+                  </button>
+                </div>
+              )}
+
+              {activeTab === 'history' && (
+                <div className="history-list">
+                  <div className="section-header-mini mb-4">
+                    <h4>Past Spiritual Journeys</h4>
+                  </div>
+                  <div className="history-items">
+                    {[
+                      { seva: 'Sahasra Deepalankara Seva', date: '2024-03-12', result: 'Completed' },
+                      { seva: 'Visesha Pooja', date: '2024-01-05', result: 'Completed' }
+                    ].map((item, i) => (
+                      <div key={i} className="history-item glass-card mb-3">
+                        <div className="item-info">
+                          <h4>{item.seva}</h4>
+                          <p>{item.date}</p>
+                        </div>
+                        <span className="status-badge active">{item.result}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'help' && (
+                <div className="help-panel">
+                  <div className="dashboard-help-grid">
+                    <div className="help-content">
+                      <h3>Frequently Asked Questions</h3>
+                      <div className="dashboard-faq">
+                        {[
+                          { q: "How to download my Darshan ticket?", a: "Once confirmed, you can view and download your ticket from the 'My Bookings' tab above." },
+                          { q: "ID proof verification failed?", a: "Ensure you are using the same ID proof number provided during the sacred booking process." },
+                          { q: "Payment issues for E-Hundi?", a: "Wait for 15 minutes for the status to update. If it fails, the amount will be refunded by your bank within 5-7 days." }
+                        ].map((item, i) => (
+                          <div key={i} className="faq-box glass-card mb-3">
+                            <h5 className="mb-2" style={{ color: 'var(--primary)' }}>{item.q}</h5>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>{item.a}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="help-sidebar">
+                      <div className="support-card glass-card">
+                        <h4>Need Live Help?</h4>
+                        <div className="support-links mt-3">
+                          <div className="link-item">
+                            <Phone size={16} /> <span>+91 877 1234567</span>
+                          </div>
+                          <div className="link-item">
+                            <Mail size={16} /> <span>help@govindaraja.in</span>
+                          </div>
+                        </div>
+                        <hr className="my-4" style={{ opacity: 0.1 }} />
+                        <button className="btn-primary w-full" onClick={() => setIsChatOpen(true)}>
+                          <MessageSquare size={16} /> Start Chat
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </main>
 
       {/* Floating Chat Window */}
       <AnimatePresence>
         {isChatOpen && (
-          <motion.div 
+          <motion.div
             className="sacred-chat-window glass-card"
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -800,9 +920,9 @@ const Account = () => {
               </div>
             </div>
             <div className="chat-footer">
-              <input 
-                type="text" 
-                placeholder="Type your message..." 
+              <input
+                type="text"
+                placeholder="Type your message..."
                 value={chatMessage}
                 onChange={(e) => setChatMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && setChatMessage('')}
@@ -816,76 +936,341 @@ const Account = () => {
       </AnimatePresence>
 
       <style>{`
-        .dashboard-grid {
+        .admin-layout {
           display: grid;
-          grid-template-columns: 300px 1fr;
-          gap: 3rem;
-          align-items: start;
-          margin-top: -55px;
+          grid-template-columns: 280px 1fr;
+          height: 100vh;
+          background: var(--bg);
+          overflow: hidden;
+          padding-top: 0;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 9999;
+          font-family: var(--font-main);
         }
 
-        .user-profile {
-          padding: 2.5rem;
-          text-align: center;
+        .admin-sidebar {
+          background: var(--secondary);
+          color: #fff;
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          border-right: 1px solid var(--accent);
+          position: relative;
+          overflow-y: auto; /* Allow scrolling for the sidebar items if they overflow */
+        }
+
+        .admin-sidebar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-track {
+          background: rgba(0,0,0,0.2);
+        }
+        
+        .admin-sidebar::-webkit-scrollbar-thumb {
+          background: var(--accent);
+          border-radius: 10px;
+        }
+
+        .admin-sidebar::after {
+          content: '';
+          position: absolute;
+          top: 0; right: 0; bottom: 0; left: 0;
+          background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 50c0-15 12-27 27-27s27 12 27 27-12 27-27 27-27-12-27-27zM0 50c0-15 12-27 27-27s27 12 27 27-12 27-27 27-27-12-27-27z' fill='%23ffffff' fill-opacity='0.03' /%3E%3C/svg%3E");
+          pointer-events: none;
+        }
+
+        .admin-logo-img {
+          width: 35px;
+          height: 35px;
+          object-fit: contain;
           background: white;
-          margin-bottom: 2rem;
+          padding: 3px;
+          border-radius: 8px;
         }
 
-        .avatar {
-          width: 80px;
-          height: 80px;
-          background: var(--marble);
-          border-radius: 50%;
+        .header-logo-img {
+          width: 32px;
+          height: 32px;
+          object-fit: contain;
+        }
+
+        .sidebar-logo {
           display: flex;
           align-items: center;
-          justify-content: center;
-          margin: 0 auto 1.5rem;
-          color: var(--primary);
-          border: 2px solid var(--primary);
+          gap: 1rem;
+          font-size: 1.1rem;
+          font-weight: 700;
+          margin-bottom: 3rem;
+          color: var(--accent);
+          font-family: var(--font-heading);
+          z-index: 2;
         }
 
-        .user-profile h3 {
-          font-size: 1.25rem;
-          margin-bottom: 0.25rem;
-          color: var(--secondary);
-        }
-
-        .user-profile span {
-          font-size: 0.85rem;
-          color: var(--text-muted);
-        }
-
-        .dashboard-nav {
+        .sidebar-nav {
           display: flex;
           flex-direction: column;
           gap: 0.5rem;
+          z-index: 2;
         }
 
-        .nav-item {
+        .nav-btn {
           display: flex;
           align-items: center;
           gap: 1rem;
           padding: 1rem 1.5rem;
           border-radius: 12px;
+          color: rgba(255,255,255,0.7);
           font-weight: 600;
-          color: var(--text-muted);
           transition: all 0.3s ease;
+          width: 100%;
+          text-align: left;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+        }
+
+        .nav-btn:hover {
+          background: rgba(255,255,255,0.1);
+          color: var(--accent);
+        }
+
+        .nav-btn.active {
+          background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+          color: #fff;
+          box-shadow: 0 4px 15px rgba(255, 153, 51, 0.4);
+        }
+
+        .sidebar-toggle {
+          display: none;
+          align-items: center;
+          justify-content: center;
+          background: var(--secondary);
+          color: white;
+          padding: 0.6rem;
+          border-radius: 10px;
+          border: 1px solid var(--accent);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          cursor: pointer;
+          flex-shrink: 0;
+        }
+
+        .sidebar-divider {
+          height: 1px;
+          background: rgba(255,255,255,0.1);
+          margin: 2rem 0;
+        }
+
+        .nav-btn.logout {
+          color: #ffcccc;
+          border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .nav-btn.logout:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: #fff;
+        }
+
+        .profile-dropdown {
+          position: absolute;
+          top: calc(100% + 15px);
+          right: 0;
+          width: 220px;
+          background: white;
+          border-radius: 20px;
+          padding: 1.2rem;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+          border: 1px solid var(--glass-border);
+          z-index: 1000;
+          text-align: left;
+        }
+
+        .dropdown-header {
+          padding: 0 0.5rem 0.5rem 0.5rem;
+        }
+
+        .dropdown-divider {
+          height: 1px;
+          background: #f1f5f9;
+          margin: 1rem 0;
+        }
+
+        .dropdown-item {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          padding: 0.7rem 0.8rem;
+          border: none;
+          background: transparent;
+          color: var(--text);
+          font-weight: 600;
+          font-size: 0.85rem;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+          background: #f8fafc;
+          color: var(--primary);
+          transform: translateX(5px);
+        }
+
+        .dropdown-item.logout-item {
+          color: #ef4444;
+        }
+
+        .dropdown-item.logout-item:hover {
+          background: #fef2f2;
+          color: #ef4444;
+        }
+
+        .admin-main {
+          display: flex;
+          flex-direction: column;
+          overflow-y: auto;
+          overflow-x: hidden;
+          background: var(--bg);
           width: 100%;
         }
 
-        .nav-item:hover, .nav-item.active {
-          background: white;
-          color: var(--primary);
-          box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        .admin-header {
+          background: var(--glass);
+          backdrop-filter: blur(10px);
+          padding: 1.5rem 2rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          border-bottom: 1px solid var(--glass-border);
+          gap: 1.5rem;
         }
 
-        .nav-item.logout {
-          margin-top: 2rem;
-          color: #ff4444;
+        .header-title {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          min-width: 0;
+          flex: 1;
         }
 
-        .nav-item.logout:hover {
-          background: #fff5f5;
+        .header-title h2 {
+          font-family: var(--font-heading);
+          color: var(--accent);
+          font-size: 1.4rem;
+          margin: 0;
+          font-weight: 700;
+          white-space: normal;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-shrink: 0;
+        }
+
+        .back-home-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1.2rem;
+          background: rgba(128, 0, 0, 0.05);
+          color: var(--secondary);
+          border: 1px solid rgba(128, 0, 0, 0.15);
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          text-decoration: none;
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+
+        .back-home-btn:hover {
+          background: var(--secondary);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        .home-nav-btn {
+          color: var(--accent) !important;
+          border: 1px solid rgba(255, 153, 51, 0.2);
+          background: rgba(255, 153, 51, 0.05);
+          margin-bottom: 1rem;
+        }
+        
+        .home-nav-btn:hover {
+          background: var(--accent) !important;
+          color: var(--secondary) !important;
+        }
+
+        .header-action-btn {
+          background: rgba(128, 0, 0, 0.05);
+          color: var(--secondary);
+          border: 1px solid rgba(128, 0, 0, 0.1);
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          position: relative;
+        }
+
+        .header-action-btn:hover {
+          background: var(--secondary);
+          color: white;
+          transform: scale(1.05);
+        }
+
+        .admin-profile {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          font-weight: 600;
+        }
+
+        .admin-avatar {
+          width: 34px;
+          height: 34px;
+          background: var(--accent);
+          color: var(--secondary);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 800;
+        }
+
+        .user-name {
+          font-weight: 700;
+          color: var(--secondary);
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.2;
+        }
+
+        .user-role {
+          font-size: 0.75rem;
+          color: var(--text-muted);
+          margin: 4px 0 0 0;
+        }
+
+        .admin-content {
+          padding: 3rem;
         }
 
         .welcome-header {
@@ -1216,11 +1601,54 @@ const Account = () => {
           }
         }
 
-        @media (max-width: 992px) {
-          .dashboard-grid { grid-template-columns: 1fr; }
-          .stats-grid { grid-template-columns: repeat(3, 1fr); }
-          .settings-grid { grid-template-columns: 1fr; }
-          .dashboard-help-grid { grid-template-columns: 1fr; }
+        @media (max-width: 1024px) {
+          .admin-layout {
+            grid-template-columns: 1fr;
+          }
+          
+          .sidebar-toggle {
+            display: flex;
+          }
+
+          .admin-sidebar {
+            position: fixed;
+            left: -100%;
+            top: 0;
+            bottom: 0;
+            width: 280px;
+            z-index: 10000;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+
+          .admin-sidebar.open {
+            left: 0;
+          }
+
+          .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+          }
+
+          .admin-header {
+            padding: 1.2rem 1.5rem;
+            gap: 1rem;
+          }
+          .header-title {
+            margin-left: 0;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .dashboard-help-grid {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+          }
         }
 
         @media (max-width: 768px) {
@@ -1243,30 +1671,50 @@ const Account = () => {
           .welcome-header h1 { font-size: 1.8rem; }
           .auth-container { padding: 2rem 1.5rem; }
           .auth-header h2 { font-size: 1.6rem; }
-          .dashboard-nav {
-            flex-direction: row;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-          }
-          .nav-item {
-            padding: 0.7rem 1rem;
-            font-size: 0.85rem;
-            gap: 0.5rem;
-          }
-          .nav-item.logout { margin-top: 0; }
           .settings-panel { padding: 1.5rem; }
-          .user-profile { padding: 1.5rem; }
+          .settings-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+          }
           .section-header { flex-wrap: wrap; gap: 0.5rem; }
           .faq-box { padding: 1.25rem; }
+
+          .back-home-btn span {
+            display: none;
+          }
+          .back-home-btn {
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            justify-content: center;
+          }
+
+          .header-title h2 { 
+            font-size: 1rem !important; 
+          }
+          .header-title {
+            margin-left: 0;
+          }
+          .admin-header { height: auto; padding: 1rem; flex-direction: row; justify-content: space-between; align-items: center; gap: 0.75rem; }
+          .header-actions { width: auto; justify-content: flex-end; flex-direction: row; gap: 0.5rem; }
+          .admin-profile { flex-direction: row; align-items: center; text-align: right; gap: 0.5rem; }
+          .admin-content { padding: 1.5rem; display: flex; flex-direction: column; align-items: center; }
         }
 
         @media (max-width: 480px) {
-          .dashboard-grid { margin-top: -20px; }
           .booking-item { padding: 1rem; }
-          .nav-item { padding: 0.6rem 0.75rem; font-size: 0.8rem; }
           .stat-card { padding: 1.25rem; }
           .stat-card .value { font-size: 1.4rem; }
           .auth-container { padding: 1.5rem 1rem; }
+
+          .admin-content { padding: 1.5rem 0.5rem; width: 100%; display: flex; flex-direction: column; align-items: center; }
+          .sidebar-toggle { padding: 0.4rem; border-radius: 10px; }
+          .header-title h2 { 
+            font-size: 0.85rem !important; 
+          }
+          .admin-header { padding: 0.8rem 0.5rem; flex-direction: row; justify-content: space-between; align-items: center; }
+          .nav-btn { padding: 0.8rem 1rem; font-size: 0.9rem; }
         }
       `}</style>
     </div>

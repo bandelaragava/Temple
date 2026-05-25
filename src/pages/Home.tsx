@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Hero from '../components/home/Hero';
 import DaySchedule from '../components/home/DaySchedule';
 import Almanac from '../components/home/Almanac';
-import AartiCountdown from '../components/home/AartiCountdown';
+import AartiScheduleBanner from '../components/home/AartiScheduleBanner';
+import DailyDivineSummary from '../components/home/DailyDivineSummary';
 import { motion } from 'framer-motion';
 import { Info, Shield, Clock } from 'lucide-react';
 
@@ -127,7 +128,8 @@ const Home = () => {
       <Hero />
 
       <div className="container">
-        <AartiCountdown />
+        <AartiScheduleBanner />
+        <DailyDivineSummary />
       </div>
 
       <section className="section-padding temple-intro">
@@ -228,22 +230,22 @@ const Home = () => {
               <button className="btn-primary" style={{ marginTop: '2rem' }} onClick={() => navigate('/darshan')}>View Full Details</button>
             </div>
 
-            <div className="darshan-timings-list" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div className="darshan-timings-list">
               {darshanTypes.map((type: any) => (
-                <div key={type.id} className="timing-item glass-card" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div key={type.id} className="timing-item glass-card">
+                  <div className="timing-item-header">
                     <div>
                       <h4 style={{ margin: 0, fontSize: '1.4rem', color: 'var(--secondary)' }}>{type.name}</h4>
                       <p style={{ margin: '0.5rem 0', color: 'var(--text-muted)', fontSize: '1rem', fontWeight: '600' }}>
                         <Clock size={16} style={{ verticalAlign: 'middle', marginRight: '0.5rem' }} /> {type.timings}
                       </p>
                     </div>
-                    <span className="status-badge" style={{ padding: '0.5rem 1.2rem', background: 'rgba(255,153,51,0.1)', color: 'var(--secondary)', borderRadius: '50px', fontWeight: '700', fontSize: '0.85rem', border: '1px solid rgba(255,153,51,0.3)' }}>
+                    <span className="status-badge-live">
                       {type.liveUpdates || 'Live Status'}
                     </span>
                   </div>
 
-                  <div className="darshan-details-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', borderTop: '1px solid var(--glass-border)', paddingTop: '1.5rem' }}>
+                  <div className="darshan-details-grid">
                     <div>
                       <h5 style={{ margin: '0 0 0.5rem', color: 'var(--primary)', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Entry Details</h5>
                       <p style={{ margin: 0, fontSize: '0.95rem' }}>{type.entryDetails}</p>
@@ -254,7 +256,7 @@ const Home = () => {
                     </div>
                   </div>
 
-                  <div style={{ background: 'rgba(0,0,0,0.05)', padding: '1rem', borderRadius: '12px', borderLeft: '4px solid var(--secondary)' }}>
+                  <div className="timing-item-desc">
                     <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>{type.description}</p>
                   </div>
                 </div>
@@ -404,6 +406,53 @@ const Home = () => {
 
         .marble-bg {
           background-color: transparent;
+        }
+
+        .darshan-timings-list {
+          display: flex;
+          flex-direction: column;
+          gap: 2rem;
+        }
+
+        .timing-item {
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+        }
+
+        .timing-item-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 1.5rem;
+        }
+
+        .status-badge-live {
+          padding: 0.5rem 1.2rem;
+          background: rgba(255, 153, 51, 0.1);
+          color: var(--secondary);
+          border-radius: 50px;
+          font-weight: 700;
+          font-size: 0.85rem;
+          border: 1px solid rgba(255, 153, 51, 0.3);
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+
+        .darshan-details-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+          border-top: 1px solid var(--glass-border);
+          padding-top: 1.5rem;
+        }
+
+        .timing-item-desc {
+          background: rgba(0,0,0,0.05);
+          padding: 1rem;
+          border-radius: 12px;
+          border-left: 4px solid var(--secondary);
         }
 
         .timings-card {
@@ -606,6 +655,18 @@ const Home = () => {
           .lead { font-size: 1.1rem; }
           .live-content { padding: 1.5rem; }
           .seva-list-home { padding: 2rem 1.5rem !important; }
+          .timing-item { padding: 1.25rem; }
+        }
+
+        @media (max-width: 500px) {
+          .timing-item-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+          }
+          .status-badge-live {
+            align-self: flex-start;
+          }
         }
 
         @media (max-width: 480px) {

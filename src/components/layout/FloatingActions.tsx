@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, ChevronUp } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 const FloatingActions = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -19,18 +20,24 @@ const FloatingActions = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Hide the quick booking button on booking page, devotee portal/account page, or store page
+  const hideBookingFab = location.pathname === '/booking' || location.pathname === '/account' || location.pathname === '/store';
+
   return (
     <div className="floating-actions">
-      <Link to="/booking" className="fab fab-booking">
-        <Calendar size={24} />
-        <span className="fab-text">{t('fab_quick_booking')}</span>
-      </Link>
+      {!hideBookingFab && (
+        <Link to="/booking" className="fab fab-booking" title={t('fab_quick_booking')}>
+          <Calendar size={20} />
+          <span className="fab-text">{t('fab_quick_booking')}</span>
+        </Link>
+      )}
       
       <button 
         className={`fab fab-scroll ${showScrollTop ? 'visible' : ''}`}
         onClick={scrollToTop}
+        title="Scroll to Top"
       >
-        <ChevronUp size={24} />
+        <ChevronUp size={20} />
       </button>
 
       <style>{`
@@ -99,8 +106,18 @@ const FloatingActions = () => {
         }
 
         @media (max-width: 768px) {
+          .floating-actions {
+            bottom: 1rem;
+            right: 1rem;
+            gap: 0.6rem;
+          }
+          .fab {
+            width: 44px;
+            height: 44px;
+          }
           .fab-text { display: none; }
-          .fab-booking { width: 56px; padding: 0; border-radius: 50%; }
+          .fab-booking { width: 44px; padding: 0; border-radius: 50%; }
+          .fab-scroll { width: 40px; height: 40px; }
         }
       `}</style>
     </div>

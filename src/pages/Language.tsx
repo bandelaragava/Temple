@@ -6,10 +6,14 @@ import { useTranslation } from 'react-i18next';
 
 const Language = () => {
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
-  const language = i18n.language;
+  const { t } = useTranslation();
+  const [activeLang, setActiveLang] = React.useState(() => {
+    const match = document.cookie.match(/googtrans=\/en\/([^;]+)/);
+    return match ? match[1] : 'en';
+  });
+
   const setLanguage = (lang: string) => {
-    i18n.changeLanguage(lang);
+    setActiveLang(lang);
 
     // Set cookies for persistence
     const cookieValue = lang === 'en' ? '' : `/en/${lang}`;
@@ -86,7 +90,7 @@ const Language = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: idx * 0.05 }}
-              className={`lang-card glass-card ${language === lang.id ? 'selected' : ''}`}
+              className={`lang-card glass-card ${activeLang === lang.id ? 'selected' : ''}`}
               onClick={() => handleSelect(lang.id)}
             >
               <div className="lang-main">
@@ -94,7 +98,7 @@ const Language = () => {
                   <span className="native">{lang.native}</span>
                   <span className="name">{t(lang.tKey)}</span>
                 </div>
-                {language === lang.id && (
+                {activeLang === lang.id && (
                   <div className="check-icon">
                     <Check size={16} />
                   </div>

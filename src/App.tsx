@@ -19,8 +19,9 @@ import Help from './pages/Help';
 import Store from './pages/Store';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // This component ensures Google Translate re-evaluates the page on route changes
 const LanguageSync = () => {
@@ -56,45 +57,67 @@ const ScrollToTop = () => {
   return null;
 };
 
-function App() {
-  return (
+const AppContent = () => {
+  const { i18n } = useTranslation();
+  const location = useLocation();
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true');
 
-    <Router>
-      <ScrollToTop />
-      <LanguageSync />
-      <div className="app-container">
-        {/* Official Temple Banner Above Navbar */}
+  useEffect(() => {
+    const handleAuthChange = () => {
+      setIsLoggedIn(localStorage.getItem('isLoggedIn') === 'true');
+    };
+    window.addEventListener('authChange', handleAuthChange);
+    // Sync initially and on pathname updates
+    handleAuthChange();
+    return () => window.removeEventListener('authChange', handleAuthChange);
+  }, [location.pathname]);
+
+  const isAdminPath = location.pathname === '/admin';
+  const isAccountPath = location.pathname === '/account' && isLoggedIn;
+  const showFooter = !isAdminPath && !isAccountPath;
+
+  return (
+    <div className="app-container">
+      {/* Official Temple Banner Above Navbar */}
       <div className="official-banner">
         {/* Only the image is displayed via CSS background */}
       </div>
-        <Ticker />
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/booking" element={<Booking />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/darshan" element={<Darshan />} />
-            <Route path="/donate" element={<Donate />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/festivals" element={<Festivals />} />
-            <Route path="/e-hundi" element={<EHundi />} />
-            <Route path="/rituals" element={<Darshan />} />
-            <Route path="/contact" element={<Help />} />
-            <Route path="/faq" element={<Help />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/terms" element={<TermsOfService />} />
-            <Route path="/language" element={<Language />} />
-            <Route path="/account" element={<Account />} />
-            <Route path="/admin" element={<AdminPanel />} />
-            <Route path="/store" element={<Store />} />
-          </Routes>
-        </main>
-        <Footer />
-        <FloatingActions />
-      </div>
-    </Router>
+      <Ticker />
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/booking" element={<Booking />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/darshan" element={<Darshan />} />
+          <Route path="/donate" element={<Donate />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/festivals" element={<Festivals />} />
+          <Route path="/e-hundi" element={<EHundi />} />
+          <Route path="/rituals" element={<Darshan />} />
+          <Route path="/contact" element={<Help />} />
+          <Route path="/faq" element={<Help />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/language" element={<Language />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/store" element={<Store />} />
+        </Routes>
+      </main>
+      {showFooter && <Footer />}
+      <FloatingActions />
+    </div>
+  );
+};
 
+function App() {
+  return (
+    <Router>
+      <ScrollToTop />
+      <LanguageSync />
+      <AppContent />
+    </Router>
   );
 }
 

@@ -1,14 +1,12 @@
 import React from 'react';
 import { Bell } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 const Ticker = () => {
-  const { t } = useTranslation();
   const news = [
-    t('news_1'),
-    t('news_2'),
-    t('news_3'),
-    t('news_4')
+    "Annual Brahmotsavams will commence next month. Advance booking for special Darshan is now open.",
+    "New E-Hundi portal launched for seamless digital offerings.",
+    "Pilgrims are requested to strictly follow the traditional dress code.",
+    "Free Annadanam available daily for all devotees visiting the temple."
   ];
 
   return (

@@ -2,10 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, ArrowRight } from 'lucide-react';
 import { Facebook, Twitter, Instagram, Youtube } from '../common/SocialIcons';
-import { useTranslation } from 'react-i18next';
 
 const Footer = () => {
-  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -16,11 +14,11 @@ const Footer = () => {
             <Link to="/" className="f-logo">
               <span className="logo-icon">🛕</span>
               <div className="logo-text">
-                <span className="temple-name">{t('temple_name')}</span>
-                <span className="temple-tag">{t('temple_tag')}</span>
+                <span className="temple-name">Sri Govindha Raja Swami Temple</span>
+                <span className="temple-tag">The Divine Heart of Tirupati</span>
               </div>
             </Link>
-            <p className="f-desc">{t('footer_desc')}</p>
+            <p className="f-desc">Sri Govindha Raja Swamy Devasthanam stands as a beacon of spiritual solace and cultural heritage in Hyderabad. Dedicated to preserving ancient Vedic traditions and fostering social harmony.</p>
             <div className="social-links">
               <a href="https://facebook.com/temple" target="_blank" rel="noopener noreferrer" className="social-btn"><Facebook size={20} /></a>
               <a href="https://twitter.com/temple" target="_blank" rel="noopener noreferrer" className="social-btn"><Twitter size={20} /></a>
@@ -30,35 +28,35 @@ const Footer = () => {
           </div>
 
           <div className="footer-links">
-            <h4>{t('quick_links')}</h4>
+            <h4>Quick Links</h4>
             <ul>
-              <li><Link to="/about">{t('nav_about')}</Link></li>
-              <li><Link to="/darshan">{t('darshan_timings')}</Link></li>
-              <li><Link to="/booking">{t('nav_booking')}</Link></li>
-              <li><Link to="/rituals">{t('ritual_timeline')}</Link></li>
-              <li><Link to="/gallery">{t('nav_gallery')}</Link></li>
-              <li><Link to="/festivals">{t('nav_festivals')}</Link></li>
+              <li><Link to="/about">About Temple</Link></li>
+              <li><Link to="/darshan">Darshan Timings</Link></li>
+              <li><Link to="/booking">Book Darshan</Link></li>
+              <li><Link to="/rituals">Rituals & Timeline</Link></li>
+              <li><Link to="/gallery">Photo Gallery</Link></li>
+              <li><Link to="/festivals">Upcoming Festivals</Link></li>
             </ul>
           </div>
 
           <div className="footer-links">
-            <h4>{t('reach_out')}</h4>
+            <h4>Reach Out</h4>
             <ul>
-              <li><Link to="/donate">{t('donate_now') || t('nav_donate')}</Link></li>
+              <li><Link to="/donate">Donate Now</Link></li>
               <li><Link to="/store">Temple Store</Link></li>
-              <li><Link to="/contact">{t('nav_contact')}</Link></li>
-              <li><Link to="/faq">{t('nav_faq')}</Link></li>
-              <li><Link to="/privacy">{t('nav_privacy')}</Link></li>
-              <li><Link to="/terms">{t('nav_terms')}</Link></li>
+              <li><Link to="/contact">Contact Us</Link></li>
+              <li><Link to="/faq">FAQs</Link></li>
+              <li><Link to="/privacy">Privacy Policy</Link></li>
+              <li><Link to="/terms">Terms of Service</Link></li>
             </ul>
           </div>
 
           <div className="footer-newsletter">
-            <h4>{t('stay_connected_footer')}</h4>
-            <p>{t('newsletter_desc')}</p>
+            <h4>Stay Connected</h4>
+            <p>Subscribe to our newsletter for daily updates and festival schedules.</p>
             <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
-              <input type="email" placeholder={t('placeholder_email')} />
-              <button type="submit" onClick={() => alert(t('alert_subscribed'))}><ArrowRight size={20} /></button>
+              <input type="email" placeholder="Enter your email" />
+              <button type="submit" onClick={() => alert("Thank you for subscribing!")}><ArrowRight size={20} /></button>
             </form>
             <div className="contact-info">
               <div className="info-item">
@@ -80,9 +78,18 @@ const Footer = () => {
 
       <div className="footer-bottom">
         <div className="container bottom-content">
-          <p>&copy; {currentYear} Sri Govindha Raja Swamy Devasthanam. {t('all_rights_reserved')}.</p>
+          <p>© {currentYear} Sri Govindha Raja Swami Temple. All Rights Reserved.</p>
+          <span className="bottom-separator"></span>
           <div className="dev-credit">
-            {t('dev_credit')}
+            Developed by{' '}
+            <a
+              href="https://www.futureinvosolutions.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dev-credit-link"
+            >
+              Future Invo Solutions
+            </a>
           </div>
         </div>
       </div>
@@ -253,11 +260,43 @@ const Footer = () => {
 
         .bottom-content {
           display: flex;
-          flex-direction: column; /* Stack bottom content */
-          justify-content: center;
+          flex-direction: row;
+          justify-content: flex-start;
           align-items: center;
-          gap: 1rem;
-          text-align: center;
+          flex-wrap: nowrap;
+          gap: 15rem;
+        }
+
+        .bottom-content p {
+          white-space: nowrap;
+          margin: 0;
+          flex-shrink: 0;
+        }
+
+        .bottom-separator {
+          color: rgba(255, 255, 255, 0.3);
+          font-size: 1rem;
+          flex-shrink: 0;
+          user-select: none;
+        }
+
+        .dev-credit {
+          font-size: 0.85rem;
+          color: rgba(255, 255, 255, 0.5);
+          letter-spacing: 0.3px;
+        }
+
+        .dev-credit-link {
+          color: var(--accent);
+          text-decoration: none;
+          font-weight: 600;
+          transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .dev-credit-link:hover {
+          color: #FFD700;
+          text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+          text-decoration: underline;
         }
 
         /* Responsive Breakpoints */

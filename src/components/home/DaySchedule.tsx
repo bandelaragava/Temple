@@ -477,14 +477,10 @@ const DaySchedule = () => {
           .schedule-controls { margin-bottom: 3rem; }
         }
 
-        @media (max-width: 640px) {
-          .bento-grid { grid-template-columns: 1fr 1fr; gap: 1rem; }
-          .bento-item { padding: 1rem; }
+        @media (max-width: 768px) {
+          .bento-grid { grid-template-columns: 1fr !important; gap: 1.25rem; }
+          .bento-item { padding: 1.25rem; }
           .schedule-header-premium { margin-bottom: 2.5rem; }
-        }
-
-        @media (max-width: 480px) {
-          .bento-grid { grid-template-columns: 1fr; }
           .tab-pill-item { padding: 0.6rem 1.4rem; font-size: 0.85rem; }
           .schedule-controls { margin-bottom: 2rem; }
         }

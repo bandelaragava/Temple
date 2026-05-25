@@ -33,9 +33,11 @@ import {
   Ticket,
   ShoppingCart,
   Menu,
-  User
+  User,
+  Home
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { PRODUCTS } from './store/storeData';
 
 const Admin = () => {
@@ -541,10 +543,7 @@ const Admin = () => {
 
   return (
     <div className={`admin-layout ${isSidebarOpen ? 'sidebar-open' : ''}`}>
-      {/* Sidebar Mobile Toggle */}
-      <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-        {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+
 
       {/* Sidebar Overlay for Mobile */}
       <AnimatePresence>
@@ -567,6 +566,10 @@ const Admin = () => {
         </div>
 
         <nav className="sidebar-nav">
+          <Link to="/" className="nav-btn home-nav-btn">
+            <Home size={18} /> Back to Website
+          </Link>
+          <div className="sidebar-divider"></div>
           <button
             className={`nav-btn ${activeSection === 'overview' ? 'active' : ''}`}
             onClick={() => handleNavClick('overview')}
@@ -772,9 +775,12 @@ const Admin = () => {
       {/* Main Content */}
       <main className="admin-main" ref={mainContentRef}>
         <header className="admin-header">
-          <div className="header-title" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <button className="sidebar-toggle" onClick={() => setIsSidebarOpen(!isSidebarOpen)} aria-label="Toggle Sidebar">
+            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <div className="header-title">
             <img src="/logo.png" alt="Logo" className="header-logo-img" />
-            <h2 style={{ fontFamily: 'var(--font-heading)', color: 'var(--accent)', fontSize: '1.4rem', margin: 0, fontWeight: 700 }}>
+            <h2>
               {siteContent.templeName}
             </h2>
           </div>
@@ -788,6 +794,10 @@ const Admin = () => {
             />
           </div>
           <div className="header-actions">
+            <Link to="/" className="back-home-btn" title="Back to Main Website">
+              <Home size={18} />
+              <span>Home</span>
+            </Link>
             <div className="notification-wrapper-admin" ref={notificationRef}>
               <button
                 className="icon-btn-admin"
@@ -1963,7 +1973,7 @@ const Admin = () => {
           flex-direction: column;
           border-right: 1px solid var(--accent);
           position: relative;
-          overflow-y: auto; /* Enable scrolling for many tabs */
+          overflow-y: auto; /* Allow scrolling for the sidebar items if they overflow */
         }
 
         .admin-sidebar::-webkit-scrollbar {
@@ -2050,16 +2060,16 @@ const Admin = () => {
 
         .sidebar-toggle {
           display: none;
-          position: fixed;
-          top: 1.5rem;
-          left: 1.5rem;
-          z-index: 10001;
+          align-items: center;
+          justify-content: center;
           background: var(--secondary);
           color: white;
-          padding: 0.8rem;
-          border-radius: 12px;
+          padding: 0.6rem;
+          border-radius: 10px;
           border: 1px solid var(--accent);
-          box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+          cursor: pointer;
+          flex-shrink: 0;
         }
 
         @media (max-width: 1024px) {
@@ -2097,10 +2107,11 @@ const Admin = () => {
           }
 
           .admin-header {
-            padding-left: 5rem;
+            padding: 1.2rem 1.5rem;
+            gap: 1rem;
           }
           .header-title {
-            margin-left: 1rem;
+            margin-left: 0;
           }
           .dashboard-grid {
             grid-template-columns: 1fr;
@@ -2119,16 +2130,26 @@ const Admin = () => {
             padding: 1.5rem !important;
           }
           .header-search { display: none !important; }
+          .grid-item h3, .admin-tabs h3 { padding-left: 0.5rem; }
+          .header-title {
+            margin-left: 0;
+          }
           .header-title h2 { 
             font-size: 1rem !important; 
           }
-          .grid-item h3, .admin-tabs h3 { padding-left: 0.5rem; }
-          .header-title {
-            margin-left: 3.5rem;
-          }
-          .admin-header { height: auto; padding: 1.5rem 0.5rem 1.5rem 5rem; flex-direction: row; justify-content: space-between; align-items: center; gap: 0.5rem; }
-          .header-actions { width: auto; justify-content: flex-end; flex-direction: row; gap: 0.2rem; }
+          .admin-header { height: auto; padding: 1rem; flex-direction: row; justify-content: space-between; align-items: center; gap: 0.75rem; }
+          .header-actions { width: auto; justify-content: flex-end; flex-direction: row; gap: 0.5rem; }
           .admin-profile { flex-direction: row; align-items: center; text-align: right; gap: 0.5rem; }
+          .back-home-btn span {
+            display: none;
+          }
+          .back-home-btn {
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 38px;
+            height: 38px;
+            justify-content: center;
+          }
           .admin-content { padding: 1.5rem; display: flex; flex-direction: column; align-items: center; }
           .controls-grid { grid-template-columns: 1fr; text-align: center; }
           .editor-grid { grid-template-columns: 1fr; text-align: center; }
@@ -2152,12 +2173,12 @@ const Admin = () => {
             margin: 0 auto 1.5rem auto;
           }
           .control-card { padding: 1.2rem; flex-direction: column; align-items: stretch; text-align: left; gap: 1rem; }
-          .sidebar-toggle { top: 1.2rem; left: 1rem; padding: 0.4rem; border-radius: 10px; }
+          .sidebar-toggle { padding: 0.4rem; border-radius: 10px; }
           .header-title h2 { 
             font-size: 0.85rem !important; 
           }
           .grid-item h3, .section-header-admin h2, .admin-tabs h3 { padding-left: 0.8rem; }
-          .admin-header { padding: 1.5rem 0rem 1.5rem 4.5rem; flex-direction: row; justify-content: space-between; align-items: center; }
+          .admin-header { padding: 0.8rem 0.5rem; flex-direction: row; justify-content: space-between; align-items: center; }
           .user-table-container { overflow-x: auto; width: 100%; }
           .activity-item { 
             width: 94%;
@@ -2232,6 +2253,70 @@ const Admin = () => {
           top: 0;
           z-index: 100;
           border-bottom: 1px solid var(--glass-border);
+          gap: 1.5rem;
+        }
+
+        .header-title {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          min-width: 0;
+          flex: 1;
+        }
+
+        .header-title h2 {
+          font-family: var(--font-heading);
+          color: var(--accent);
+          font-size: 1.4rem;
+          margin: 0;
+          font-weight: 700;
+          white-space: normal;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          flex-shrink: 0;
+        }
+
+        .back-home-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.5rem 1.2rem;
+          background: rgba(128, 0, 0, 0.05);
+          color: var(--secondary);
+          border: 1px solid rgba(128, 0, 0, 0.15);
+          border-radius: 30px;
+          font-weight: 600;
+          font-size: 0.9rem;
+          text-decoration: none;
+          transition: all 0.2s ease;
+          cursor: pointer;
+        }
+
+        .back-home-btn:hover {
+          background: var(--secondary);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        .home-nav-btn {
+          color: var(--accent) !important;
+          border: 1px solid rgba(255, 153, 51, 0.2);
+          background: rgba(255, 153, 51, 0.05);
+          margin-bottom: 1rem;
+        }
+        
+        .home-nav-btn:hover {
+          background: var(--accent) !important;
+          color: var(--secondary) !important;
         }
 
         .header-search {

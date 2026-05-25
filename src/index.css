@@ -423,21 +423,256 @@ button {
   -webkit-text-fill-color: transparent;
 }
 
-/* --- Google Translate Overrides --- */
-.goog-te-banner-frame.skiptranslate,
-.goog-te-banner-frame,
+/* --- Google Translate & Responsiveness Overrides --- */
+/* Hide all Google Translate header frames, tooltips, and floating widgets completely */
+[class*="goog-te-banner"],
+[class*="goog-tooltip"],
+[class*="VIpgJd-"],
 #goog-gt-tt,
-.goog-tooltip,
-.VIpgJd-ZVi9od-l4eHX-hSRGPd {
+.skiptranslate,
+iframe.skiptranslate,
+#google_translate_element {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    width: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
+/* Force body and html to remain at the top (disables top bar offset layout shifts) */
+html {
+    top: 0px !important;
+    margin-top: 0px !important;
+}
 body {
     top: 0px !important;
+    margin-top: 0px !important;
+    position: static !important;
 }
 
+/* Prevent translated text highlights from messing with layout colors */
 .goog-text-highlight {
     background-color: transparent !important;
     border: none !important; 
     box-shadow: none !important;
+}
+
+/* Global text wrapping for translated languages to maintain responsiveness on all viewports */
+html, body, p, span, h1, h2, h3, h4, h5, h6, a, button, label, li, td, th {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: normal;
+}
+
+/* ============================================================
+   GLOBAL RESPONSIVE SYSTEM — All Pages, All Sections
+   Breakpoints:
+     Laptop  : max-width 1280px
+     Tablet  : max-width 1024px
+     Tablet-P: max-width 768px
+     Mobile  : max-width 480px
+   ============================================================ */
+
+/* ---------- Laptop (≤1280px) ---------- */
+@media (max-width: 1280px) {
+  .container { max-width: 100%; padding: 0 2rem; }
+
+  /* Page headers */
+  .page-header h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+  .page-header p  { font-size: clamp(0.9rem, 2vw, 1.05rem); }
+
+  /* Section headings */
+  .section-heading h2 { font-size: clamp(1.5rem, 3.5vw, 2.4rem); }
+
+  /* Grids: allow natural wrapping */
+  .grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Official banner */
+  .official-banner { aspect-ratio: 12 / 1; }
+  .banner-container { padding: 0 2rem; }
+}
+
+/* ---------- Tablet Landscape (≤1024px) ---------- */
+@media (max-width: 1024px) {
+  .container { padding: 0 1.5rem; }
+
+  /* Page headers */
+  .page-header h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); }
+
+  /* Grids */
+  .grid-2 { grid-template-columns: 1fr !important; }
+  .grid-3 { grid-template-columns: repeat(2, 1fr) !important; }
+  .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+
+  /* Buttons */
+  .btn-primary, .btn-secondary, .btn-multi-color {
+    padding: 0.75rem 1.8rem;
+    font-size: 0.95rem;
+  }
+
+  /* Official banner */
+  .official-banner { aspect-ratio: 14 / 1; }
+  .tel-title  { font-size: 1.8rem; }
+  .eng-title  { font-size: 1rem; letter-spacing: 3px; }
+  .banner-icon { height: 60px; }
+  .temple-seal img { height: 80px; width: 80px; }
+
+  /* Glass cards */
+  .glass-card { border-radius: 16px; }
+}
+
+/* ---------- Tablet Portrait (≤768px) ---------- */
+@media (max-width: 768px) {
+  /* --- Layout --- */
+  .container { padding: 0 1rem; }
+  .section-padding { padding: 2rem 0; }
+
+  /* --- Typography — fluid everywhere --- */
+  h1 { font-size: clamp(1.5rem, 6vw, 2.2rem) !important; }
+  h2 { font-size: clamp(1.3rem, 5vw, 1.8rem) !important; }
+  h3 { font-size: clamp(1.1rem, 4vw, 1.4rem) !important; }
+  h4 { font-size: clamp(1rem, 3.5vw, 1.2rem) !important; }
+  p, li, label, span, td, th {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+  }
+
+  /* --- Page Header --- */
+  .page-header { margin-bottom: 2rem; }
+  .page-header h1 { font-size: clamp(1.5rem, 6vw, 2rem); margin: 0.75rem 0; }
+  .page-header p  { font-size: clamp(0.88rem, 2.5vw, 1rem); }
+
+  /* --- Grids — all collapse to single column --- */
+  .grid-2,
+  .grid-3,
+  .grid-4 { grid-template-columns: 1fr !important; gap: 1.5rem !important; }
+
+  /* --- Buttons --- */
+  .btn-primary, .btn-secondary, .btn-multi-color {
+    padding: 0.7rem 1.4rem;
+    font-size: 0.9rem;
+  }
+
+  /* --- Cards & Panels --- */
+  .glass-card { padding: 1.5rem !important; border-radius: 14px; }
+
+  /* --- Official Banner --- */
+  .official-banner { aspect-ratio: auto; min-height: 80px; }
+  .banner-container {
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    gap: 0.5rem;
+    text-align: center;
+  }
+  .banner-left, .banner-right {
+    display: none; /* hide side icons on mobile, keep center text */
+  }
+  .tel-title  { font-size: 1.3rem; }
+  .eng-title  { font-size: 0.85rem; letter-spacing: 2px; }
+  .loc-title  { font-size: 0.8rem; }
+  .sacred-symbols-top { font-size: 1.2rem; gap: 1rem; }
+  .temple-seal img { height: 60px; width: 60px; }
+
+  /* --- Footer --- */
+  .footer-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+  .bottom-content {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    text-align: center !important;
+  }
+  .bottom-content p { white-space: normal !important; font-size: 0.82rem; }
+  .dev-credit { font-size: 0.82rem; }
+  .bottom-separator { display: none; }
+
+  /* --- Navbar --- */
+  .nav-links-desktop-container { display: none !important; }
+  .navbar-divider { display: none !important; }
+
+  /* --- Forms --- */
+  input, select, textarea {
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+  }
+  .form-group { margin-bottom: 1rem; }
+
+  /* --- Tables — horizontal scroll on small screens --- */
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* --- Images — never overflow --- */
+  img { max-width: 100%; height: auto; }
+
+  /* --- Section headings --- */
+  .section-heading { margin-bottom: 1.75rem; }
+  .section-heading h2 { font-size: clamp(1.3rem, 5vw, 1.8rem); }
+  .subtitle { font-size: 0.8rem; letter-spacing: 2px; }
+  .divider { width: 80px; }
+}
+
+/* ---------- Mobile (≤480px) ---------- */
+@media (max-width: 480px) {
+  /* --- Layout & Spacing --- */
+  .container { padding: 0 0.75rem; }
+  .section-padding { padding: 1.5rem 0; }
+
+  /* --- Typography — tightest sizes --- */
+  h1 { font-size: clamp(1.3rem, 7vw, 1.8rem) !important; }
+  h2 { font-size: clamp(1.15rem, 6vw, 1.5rem) !important; }
+  h3 { font-size: clamp(1rem, 5vw, 1.25rem) !important; }
+  h4, h5, h6 { font-size: clamp(0.9rem, 4vw, 1.1rem) !important; }
+  p, li, label, span { font-size: clamp(0.83rem, 3vw, 0.95rem); }
+
+  /* --- Page Header --- */
+  .page-header { margin-bottom: 1.5rem; }
+  .page-header h1 { font-size: clamp(1.3rem, 7vw, 1.8rem); }
+  .modern-badge { font-size: 0.72rem; padding: 0.2rem 0.6rem; }
+
+  /* --- Buttons — full width on mobile --- */
+  .btn-primary,
+  .btn-secondary,
+  .btn-multi-color {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  /* --- Cards --- */
+  .glass-card { padding: 1.25rem !important; border-radius: 12px; }
+
+  /* --- Official Banner --- */
+  .official-banner { min-height: 60px; }
+  .tel-title  { font-size: 1.1rem; }
+  .eng-title  { font-size: 0.75rem; letter-spacing: 1.5px; }
+  .loc-title  { font-size: 0.72rem; }
+  .sacred-symbols-top { font-size: 1rem; gap: 0.75rem; margin-bottom: 0.1rem; }
+  .temple-seal img { height: 50px; width: 50px; }
+  .banner-icon { height: 40px; }
+
+  /* --- Footer bottom separator hidden on mobile --- */
+  .bottom-separator { display: none !important; }
+  .footer-bottom { padding: 1rem 0; }
+  .footer-links h4, .footer-newsletter h4 { font-size: 1rem; margin-bottom: 1rem; }
+
+  /* --- Section heading --- */
+  .section-heading h2 { font-size: clamp(1.1rem, 6vw, 1.5rem); }
+  .subtitle { font-size: 0.72rem; letter-spacing: 1.5px; }
+  .divider { width: 60px; height: 3px; margin-top: 0.75rem; }
+
+  /* --- Booking --- */
+  .booking-grid { grid-template-columns: 1fr !important; }
+  .type-card { padding: 1.5rem !important; }
+
+  /* --- Store / Gallery grids --- */
+  .products-grid,
+  .gallery-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
+
+  /* --- Tables --- */
+  td, th { font-size: 0.82rem; padding: 0.5rem !important; }
+
+  /* --- Modals & dialogs --- */
+  .modal-inner,
+  .glass-card[role="dialog"] {
+    margin: 1rem;
+    padding: 1.25rem !important;
+  }
 }

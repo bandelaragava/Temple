@@ -601,6 +601,18 @@ const Store: React.FC = () => {
           display: flex; align-items: center; justify-content: center;
           border: 2px solid white;
         }
+        @media (max-width: 768px) {
+          .floating-cart {
+            bottom: 1.25rem;
+            right: 1.25rem;
+            width: 46px;
+            height: 46px;
+          }
+          .floating-cart svg {
+            width: 18px;
+            height: 18px;
+          }
+        }
       `}</style>
     </div>
   );
