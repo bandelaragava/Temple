@@ -27,6 +27,83 @@ const FoldedHandsIcon = ({ size = 26 }: { size?: number }) => (
   </svg>
 );
 
+// Custom Lotus Icon SVG
+const LotusIcon = ({ size = 24 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="gold-icon">
+    <path d="M12 21s-3.5-4-3.5-7c0-1.5 1-2.5 2-2.5.8 0 1.3.6 1.5 1 .2-.4.7-1 1.5-1 1 0 2 1 2 2.5 0 3-3.5 7-3.5 7z" />
+    <path d="M12 21s-6.5-2.5-7.5-6c-.8-2.8 1.5-5 3.5-5 1.2 0 2.1.8 2.5 1.5-1 0-2 1-2 2.5 0 1.8 1.7 3.5 3.5 4.5" />
+    <path d="M12 21s6.5-2.5 7.5-6c.8-2.8-1.5-5-3.5-5-1.2 0-2.1.8-2.5 1.5 1 0 2 1 2 2.5 0 1.8-1.7 3.5-3.5 4.5" />
+    <path d="M12 21s-9-2-10-4.5c-1-3 1.5-5.5 3.5-5.5 1.2 0 2.1.8 2.5 1.5-1.5 0-2.5 1-2.5 2.5 0 1.8 3 4.5 6.5 5.5" opacity="0.7" />
+    <path d="M12 21s9-2 10-4.5c1-3-1.5-5.5-3.5-5.5-1.2 0-2.1.8-2.5 1.5 1.5 0 2.5 1 2.5 2.5 0 1.8-3 4.5-6.5 5.5" opacity="0.7" />
+  </svg>
+);
+
+// Custom Surya (Sun with Tilak) Icon SVG
+const SuryaIcon = ({ size = 24 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="gold-icon">
+    <circle cx="12" cy="12" r="4.5" />
+    <path d="M12 2 L13 5 L11 5 Z M12 22 L13 19 L11 19 Z M2 12 L5 13 L5 11 Z M22 12 L19 13 L19 11 Z" />
+    <path d="M4.93 4.93 L7.05 7.05 L6.34 7.76 L4.22 5.64 Z M19.07 19.07 L16.95 16.95 L17.66 16.24 L19.78 18.36 Z" />
+    <path d="M4.93 19.07 L7.05 16.95 L7.76 17.66 L5.64 19.78 Z M19.07 4.93 L16.95 7.05 L16.24 6.34 L18.36 4.22 Z" />
+    <path d="M11 10.5c0 0 1 1 1 2c0-1 1-2 1-2c0 1.5-1 3.5-1 3.5s-1-2-1-3.5z" fill="#FF4400" />
+  </svg>
+);
+
+// Custom Paduka (Sacred Feet) Icon SVG
+const PadukaIcon = ({ size = 24 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="gold-icon">
+    <path d="M8.5 7C7.1 7 6 9.2 6 12s1.1 5 2.5 5 2.5-2.2 2.5-5-1.1-5-2.5-5zM15.5 7C14.1 7 13 9.2 13 12s1.1 5 2.5 5 2.5-2.2 2.5-5-1.1-5-2.5-5z" />
+    <circle cx="8.5" cy="5" r="1" />
+    <circle cx="7" cy="5.5" r="0.8" />
+    <circle cx="10" cy="5.5" r="0.8" />
+    <circle cx="15.5" cy="5" r="1" />
+    <circle cx="14" cy="5.5" r="0.8" />
+    <circle cx="17" cy="5.5" r="0.8" />
+    <line x1="8.5" y1="9" x2="8.5" y2="12" stroke="#FF4400" strokeWidth="1" />
+    <line x1="15.5" y1="9" x2="15.5" y2="12" stroke="#FF4400" strokeWidth="1" />
+  </svg>
+);
+
+// Custom Om (ॐ) Icon SVG
+const OmIcon = ({ size = 24 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="gold-icon">
+    <path d="M12.92 10.73c.31-.38.56-.84.56-1.34 0-.96-.75-1.72-1.87-1.72-1.12 0-2.22 1.04-2.22 2.57 0 1.13.71 1.98 1.82 2.37-1.01.61-1.61 1.4-1.61 2.39 0 1.27.99 2.29 2.29 2.29 1.07 0 1.93-.68 2.24-1.63l-.79-.39c-.25.48-.73.76-1.44.76-.71 0-1.22-.45-1.22-1.16 0-.8.56-1.27 1.44-1.27h.37l-.39-.39c-.39-.39-.56-.82-.56-1.27 0-.71.45-1.13 1.13-1.13.56 0 1.02.39 1.13.91l.85-.39c-.23-.62-.76-1.07-1.5-1.13z M15.59 10.32c.32-.12.65-.28.65-.51 0-.57-.45-1.02-1.02-1.02-.25 0-.46.09-.62.22l-.42-.37c.31-.29.74-.46 1.23-.46.97 0 1.8 1 1.8 1.73 0 .66-.37 1.22-.91 1.5l-.71-.2z M14.07 7.51c-.25-.37-.25-.76-.25-1.02.25.25.42.42.42.59 0 .29-.08.43-.17.43z" />
+  </svg>
+);
+
+// Custom Pustaka (Sacred Scripture Book) Icon SVG
+const PustakaIcon = ({ size = 24 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="gold-icon">
+    <path d="M21 4H3c-1.1 0-2 .9-2 2v13c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM11 17H3V6h8v11zm10 0h-8V6h8v11z" />
+    <path d="M5 8h4v1.5H5zm0 3h4v1.5H5zm8-3h4v1.5h-4zm0 3h4v1.5h-4z" />
+  </svg>
+);
+
+// Custom Tilak (Sacred Vaishnava Urdhva Pundra) Icon SVG
+const TilakIcon = ({ size = 24 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className="gold-icon">
+    <path d="M8 4s1 10 4 12c3-2 4-12 4-12h-2s-.5 6.5-2 8c-1.5-1.5-2-8-2-8H8z" />
+    <path d="M11 5s.5 5 1 7.5c.5-2.5 1-7.5 1-7.5h-2z" fill="#FF2200" />
+    <circle cx="12" cy="18" r="1.5" fill="#FF2200" />
+  </svg>
+);
+
+// Custom Swastik Icon SVG
+const SwastikIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="gold-icon" style={{ verticalAlign: 'middle' }}>
+    <line x1="12" y1="4" x2="12" y2="20" />
+    <line x1="4" y1="12" x2="20" y2="12" />
+    <line x1="12" y1="4" x2="20" y2="4" />
+    <line x1="20" y1="12" x2="20" y2="20" />
+    <line x1="12" y1="20" x2="4" y2="20" />
+    <line x1="4" y1="12" x2="4" y2="4" />
+    <circle cx="8" cy="8" r="1" fill="currentColor" stroke="none" />
+    <circle cx="16" cy="8" r="1" fill="currentColor" stroke="none" />
+    <circle cx="16" cy="16" r="1" fill="currentColor" stroke="none" />
+    <circle cx="8" cy="16" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
 // Corner Ornament SVG for the corners of the navbar
 const CornerOrnament = ({ style }: { style?: React.CSSProperties }) => (
   <svg
@@ -127,7 +204,7 @@ const Navbar = () => {
     {
       name: "About Temple",
       path: "/about",
-      icon: <Info size={24} className="gold-icon" />,
+      icon: <LotusIcon size={24} />,
       line1: "About",
       line2: "Temple"
     },
@@ -135,28 +212,28 @@ const Navbar = () => {
       name: "Today's Panchangam",
       path: "/#panchangam",
       onClick: (e: React.MouseEvent) => handleScrollToSection(e, '.almanac-section', '#panchangam'),
-      icon: <Calendar size={24} className="gold-icon" />,
+      icon: <SuryaIcon size={24} />,
       line1: "Today's",
       line2: "Panchangam"
     },
     {
       name: "Book Darshan",
       path: "/booking",
-      icon: <TempleIcon size={24} />,
+      icon: <PadukaIcon size={24} />,
       line1: "Book",
       line2: "Darshan"
     },
     {
       name: "Sevas & Pujas",
       path: "/booking",
-      icon: <FoldedHandsIcon size={24} />,
+      icon: <DiyaIcon size={24} />,
       line1: "Sevas &",
       line2: "Pujas"
     },
     {
       name: "Devotion E-Hundi",
       path: "/e-hundi",
-      icon: <Coins size={24} className="gold-icon" />,
+      icon: <OmIcon size={24} />,
       line1: "Devotion",
       line2: "E-Hundi"
     }
@@ -185,15 +262,13 @@ const Navbar = () => {
         <CornerOrnament style={{ bottom: '6px', right: '6px', transform: 'scale(-1)' }} />
 
         <div className="nav-card-content">
-          {/* Logo Only (Name Removed) */}
-          <Link to="/" className="nav-brand-container">
-            <img src="/assets/Om_Gold.png" alt="Om" className="nav-brand-logo" />
-          </Link>
-
-          <div className="navbar-divider"></div>
-
           {/* Desktop Links */}
           <div className="nav-links-desktop-container">
+            <Link to="/" className="nav-brand-container" style={{ display: 'flex', alignItems: 'center' }}>
+              <img src="/assets/Om_Gold.png" alt="Om" className="nav-brand-logo" />
+            </Link>
+
+            <div className="navbar-divider"></div>
             {primaryLinks.map((link, idx) => (
               <React.Fragment key={idx}>
                 {link.onClick ? (
@@ -224,7 +299,7 @@ const Navbar = () => {
               onMouseLeave={() => setIsAccountMenuOpen(false)}
             >
               <div className="nav-card-item">
-                <div className="nav-item-icon"><User size={24} className="gold-icon" /></div>
+                <div className="nav-item-icon"><TilakIcon size={24} /></div>
                 <div className="nav-item-text">
                   <span className="text-line1">Devotee</span>
                   <span className="text-line2">Portal <ChevronDown size={12} style={{ display: 'inline' }} /></span>
@@ -249,6 +324,18 @@ const Navbar = () => {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Choose Language Link */}
+            <>
+              <div className="navbar-divider"></div>
+              <Link to="/language" className="nav-card-item" title="Choose Language">
+                <div className="nav-item-icon"><PustakaIcon size={24} /></div>
+                <div className="nav-item-text">
+                  <span className="text-line1">Choose</span>
+                  <span className="text-line2">Language</span>
+                </div>
+              </Link>
+            </>
 
             <div className="navbar-divider"></div>
 
@@ -312,19 +399,13 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
-            {/* Choose Language Link */}
-            <>
-              <div className="navbar-divider"></div>
-              <Link to="/language" className="nav-card-item language-btn" title="Choose Language">
-                <img src="/languageLogo.png" alt="Choose Language" className="nav-language-logo-img" />
-              </Link>
-            </>
+
 
             <div className="navbar-divider"></div>
 
             {/* Donate Orange Pill Button */}
             <Link to="/donate" className="nav-donate-pill">
-              <Heart size={18} fill="currentColor" />
+              <SwastikIcon size={18} />
               <span>Donate</span>
             </Link>
           </div>
@@ -380,7 +461,7 @@ const Navbar = () => {
 
               {/* Devotee and Admin Portal */}
               <Link to="/account" className="mobile-drawer-link-item" onClick={() => setIsMobileMenuOpen(false)}>
-                <User size={22} className="gold-icon" /> <span>Devotee Portal</span>
+                <TilakIcon size={22} /> <span>Devotee Portal</span>
               </Link>
               <Link to="/admin" className="mobile-drawer-link-item" onClick={() => setIsMobileMenuOpen(false)}>
                 <Heart size={22} className="gold-icon" /> <span>Admin Sanctuary</span>
@@ -415,14 +496,14 @@ const Navbar = () => {
               )}
 
               <Link to="/language" className="mobile-drawer-link-item" onClick={() => setIsMobileMenuOpen(false)}>
-                <img src="/languageLogo.png" alt="Choose Language" className="nav-language-logo-img" style={{ width: '22px', height: '22px' }} /> <span>Choose Language</span>
+                <PustakaIcon size={22} /> <span>Choose Language</span>
               </Link>
 
               <div className="mobile-drawer-divider"></div>
 
               {/* Donate button */}
               <Link to="/donate" className="mobile-drawer-donate-btn" onClick={() => setIsMobileMenuOpen(false)}>
-                <Heart size={18} fill="currentColor" /> Donate
+                <SwastikIcon size={18} /> Donate
               </Link>
             </div>
           </motion.div>
@@ -466,7 +547,7 @@ const Navbar = () => {
         .nav-card-content {
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: center;
           width: 100%;
           z-index: 10;
         }
@@ -515,9 +596,9 @@ const Navbar = () => {
         .nav-links-desktop-container {
           display: flex;
           align-items: center;
-          justify-content: flex-start;
+          justify-content: center;
           flex-grow: 1;
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
         }
 
         .nav-card-item {
@@ -742,7 +823,6 @@ const Navbar = () => {
           box-shadow: 0 4px 15px rgba(230, 126, 34, 0.25);
           border: none;
           font-size: 0.9rem;
-          margin-left: auto;
         }
 
         .nav-donate-pill:hover {
@@ -846,25 +926,46 @@ const Navbar = () => {
           background: #d35400;
         }
 
-        /* Large desktop sizing - scale down text if container squeezes */
+        /* Large desktop sizing - scale down text and fit in single line if container squeezes */
         @media (max-width: 1300px) {
+          .navbar-card {
+            padding: 0.5rem 0.75rem;
+          }
+          .nav-links-desktop-container {
+            flex-wrap: nowrap !important;
+            justify-content: center;
+            gap: 0.2rem;
+          }
+          .navbar-divider {
+            display: none !important;
+          }
           .nav-card-item {
-            padding: 0.5rem 0.6rem;
-            gap: 0.5rem;
+            padding: 0.3rem 0.45rem;
+            gap: 0.35rem;
+          }
+          .nav-item-icon svg {
+            width: 18px !important;
+            height: 18px !important;
           }
           .text-line2 {
-            font-size: 0.82rem;
+            font-size: 0.76rem;
           }
           .text-line1 {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
+          }
+          .nav-donate-pill {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+            gap: 0.3rem;
+          }
+          .nav-donate-pill svg {
+            width: 14px !important;
+            height: 14px !important;
           }
         }
 
         @media (max-width: 1100px) {
           .nav-brand-text {
-            display: none;
-          }
-          .navbar-divider:first-of-type {
             display: none;
           }
         }
@@ -883,6 +984,7 @@ const Navbar = () => {
             padding: 0.5rem;
             min-width: 44px;
             min-height: 44px;
+            margin-left: auto;
           }
         }
       `}</style>

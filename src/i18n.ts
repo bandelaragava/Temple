@@ -27,7 +27,7 @@ i18n
           "auth_forgot_password": "Forgot Password?",
           "auth_login_desc": "Login to access your bookings, donations and E-Hundi history.",
           "auth_login_title": "Devotee Login",
-          "auth_no_account": "Don't have an account?",
+          "auth_no_account": "Don't have an account?", 
           "auth_no_account_error": "No account found with this email. Please sign up to continue.",
           "auth_reset_desc": "Enter your email address to receive a password reset link.",
           "auth_reset_success": "Password reset link sent successfully.",

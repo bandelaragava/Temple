@@ -1428,7 +1428,7 @@ const Admin = () => {
                       placeholder="••••••••"
                       onKeyPress={(e) => e.key === 'Enter' && handleUpdateAdminKey((e.target as HTMLInputElement).value)}
                     />
-                  </div>
+                  </div>  
                   <div className="editor-card glass-card">
                     <label>Maintenance Mode</label>
                     <button

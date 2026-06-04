@@ -23,9 +23,9 @@ import {
 } from '@ishubhamx/panchangam-js';
 
 // ── Temple GPS coordinates ──────────────────────────────────────────────────
-const TEMPLE_LAT = 13.6288;   // Tirupati, Andhra Pradesh
-const TEMPLE_LON = 79.4192;
-const TEMPLE_ALT = 152;       // metres above sea level
+const TEMPLE_LAT = 17.5020;   // Jagadgiri Gutta, Hyderabad, Telangana
+const TEMPLE_LON = 78.4260;
+const TEMPLE_ALT = 540;       // metres above sea level
 const IST_OFFSET = 330;        // UTC+5:30 in minutes
 
 // ── Singleton Observer ──────────────────────────────────────────────────────

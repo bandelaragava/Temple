@@ -28,7 +28,7 @@ import html2canvas from 'html2canvas';
 const Almanac = () => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language || 'en';
-  
+
   const isTe = true;
   const sectionLocale = 'te-IN';
 
@@ -36,7 +36,7 @@ const Almanac = () => {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
-  
+
   const dateInputRef = useRef<HTMLInputElement>(null);
   const posterRef = useRef<HTMLDivElement>(null);
   const exportRef = useRef<HTMLDivElement>(null);
@@ -81,25 +81,19 @@ const Almanac = () => {
   const live = usePanchangam(selectedDate);
 
   // Extract current festival name
-  // Extract current festival name
   const getFestivalName = () => {
     let rawName = '';
     if (live.festivals && live.festivals.length > 0) {
       rawName = live.festivals[0];
-    } else {
-      // Fallback list of festivals for showcase if none returned from library
-      const dateKey = selectedDate.toISOString().split('T')[0];
-      const match = allFestivals.find(f => f.date === dateKey);
-      if (match) rawName = match.name;
     }
-    
+
     if (!rawName) {
       return isTe ? 'నిత్య పూజలు & అర్చన' : t('fest_daily_rituals');
     }
 
     if (isTe) {
       const lowerName = rawName.toLowerCase().trim();
-      
+
       if (festivalTranslationTe[lowerName]) {
         return festivalTranslationTe[lowerName];
       }
@@ -113,24 +107,6 @@ const Almanac = () => {
 
     return rawName;
   };
-
-  // Static festival list
-  const allFestivals = [
-    { date: '2026-04-14', name: t('fest_tamil_new_year') },
-    { date: '2026-04-23', name: t('fest_hanuman_jayanti') },
-    { date: '2026-04-26', name: t('fest_ekadashi') },
-    { date: '2026-05-01', name: t('fest_may_day') },
-    { date: '2026-05-05', name: t('fest_narasimha') },
-    { date: '2026-05-14', name: t('fest_purnima') },
-    { date: '2026-05-19', name: t('fest_narada_jayanti') },
-    { date: '2026-05-22', name: t('fest_biodiversity_shani') },
-    { date: '2026-06-01', name: t('fest_ganga_dussehra') },
-    { date: '2026-06-21', name: t('fest_ekadashi') },
-    { date: '2026-07-10', name: t('fest_guru_purnima') },
-    { date: '2026-08-16', name: t('fest_aadi_perukku') },
-    { date: '2026-08-28', name: t('fest_varalakshmi_vratam') },
-    { date: '2026-09-04', name: t('fest_krishna_janmashtami') },
-  ];
 
   const formattedDay = selectedDate.getDate();
   const formattedMonth = selectedDate.toLocaleString(sectionLocale, { month: 'long' }).toUpperCase();
@@ -147,7 +123,7 @@ const Almanac = () => {
         scale: 2.5,            // Higher resolution for sharing
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#7B0000',
+        backgroundColor: null, // Allow transparent/gradient background to render correctly
         logging: false,
         width: target.offsetWidth,
         height: target.offsetHeight,
@@ -221,8 +197,15 @@ const Almanac = () => {
     } else {
       // Fallback: Copy link and alert
       try {
-        await navigator.clipboard.writeText(shareUrl);
-        alert(isTe ? 'షేర్ చేయడానికి లింక్ కాపీ చేయబడింది!' : 'Link copied to clipboard for sharing!');
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(shareUrl);
+          alert(isTe ? 'షేర్ చేయడానికి లింక్ కాపీ చేయబడింది!' : 'Link copied to clipboard for sharing!');
+        } else {
+          alert(isTe
+            ? `లింక్ కాపీ చేయడానికి బ్రౌజర్ అనుమతించలేదు. షేర్ చేయడానికి ఈ లింక్ ఉపయోగించండి: ${shareUrl}`
+            : `Clipboard access blocked. Copy this link to share: ${shareUrl}`
+          );
+        }
       } catch (err) {
         alert(isTe ? 'లింక్ కాపీ చేయడం విఫలమైంది.' : 'Failed to copy link.');
       }
@@ -239,13 +222,23 @@ const Almanac = () => {
       : `${window.location.origin}/#panchangam`;
 
     try {
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      if (navigator.clipboard) {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+      } else {
+        alert(isTe ? `ఈ లింక్ కాపీ చేయండి: ${shareUrl}` : `Please copy this link: ${shareUrl}`);
+      }
     } catch {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
+      try {
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(shareUrl);
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2500);
+        }
+      } catch {
+        alert(isTe ? 'లింక్ కాపీ చేయడం విఫలమైంది.' : 'Failed to copy link.');
+      }
     }
   };
 
@@ -264,7 +257,7 @@ const Almanac = () => {
   return (
     <section className="almanac-section section-padding" id="panchangam">
       <div className="container">
-        
+
         {/* Title Header */}
         <div className="details-header text-center" style={{ marginBottom: '2.5rem' }}>
           <span className="modern-badge" style={{ background: 'var(--primary)', color: 'white', display: 'inline-block', padding: '0.4rem 1.2rem', borderRadius: '50px', fontSize: '0.85rem', fontWeight: 700, letterSpacing: '1px', textTransform: 'uppercase', boxShadow: '0 2px 10px rgba(255, 153, 51, 0.2)' }}>
@@ -297,7 +290,7 @@ const Almanac = () => {
           <button className="date-nav-btn" onClick={() => changeDate(-1)} title={t('title_prev_day')}>
             <ChevronLeft size={24} />
           </button>
-          
+
           <div
             className="date-display-badge"
             onClick={() => dateInputRef.current?.showPicker()}
@@ -351,7 +344,7 @@ const Almanac = () => {
             transition={{ duration: 0.5 }}
             className="almanac-panel-grid"
           >
-            
+
             {/* LEFT PANEL: Traditional Hindu Calendar Details */}
             <div className="almanac-panel left-panel glass-card">
               {/* Regional Vedic Header */}
@@ -434,7 +427,7 @@ const Almanac = () => {
 
             {/* RIGHT PANEL: Auspicious timings & Festivals */}
             <div className="almanac-panel right-panel glass-card">
-              
+
               {/* Festival Box */}
               <div className="festival-spotlight-box">
                 <div className="deity-frame">
@@ -452,7 +445,7 @@ const Almanac = () => {
 
               {/* Auspicious & Ritual Timings List */}
               <div className="auspicious-timings-section">
-                
+
                 <div className="timing-row-item">
                   <span className="title-col text-green-400">{isTe ? 'శుభ సమయాలు' : t('label_auspicious')}</span>
                   <span className="val-col">{isTe ? live.auspiciousTimingsTe : live.auspiciousTimings}</span>
@@ -468,7 +461,7 @@ const Almanac = () => {
                   <span className="val-col font-mono">{isTe ? live.rahuKalamTe : live.rahuKalam}</span>
                 </div>
 
-                 <div className="timing-row-item inauspicious-item">
+                <div className="timing-row-item inauspicious-item">
                   <span className="title-col text-red-400">{isTe ? 'యమగండం' : t('label_yamagandam')}</span>
                   <span className="val-col font-mono">{isTe ? live.yamagandaKalamTe : live.yamagandaKalam}</span>
                 </div>
@@ -516,8 +509,8 @@ const Almanac = () => {
 
               {/* Visual Poster Preview representing the downloaded format */}
               <div className="share-poster-preview">
-                <div className="poster-inner" ref={posterRef}>
-                  
+                <div className="poster-inner">
+
                   {/* Decorative corners */}
                   <div className="poster-corner top-left"></div>
                   <div className="poster-corner top-right"></div>
@@ -529,6 +522,7 @@ const Almanac = () => {
                       src="/panchangam-banner.png"
                       alt="Sri Govindharaja Swamy Temple - Today's Panchangam"
                       className="poster-banner-img"
+                      crossOrigin="anonymous"
                     />
                   </div>
 
@@ -639,7 +633,7 @@ const Almanac = () => {
       </AnimatePresence>
 
       {/* ── Hidden export poster — captured by html2canvas ─────────────── */}
-      {/* Rendered off-screen with solid inline styles for pixel-perfect high resolution export */}
+      {/* Rendered off-screen with identical styling, layout and classes as the popup preview */}
       <div
         ref={exportRef}
         aria-hidden="true"
@@ -647,172 +641,92 @@ const Almanac = () => {
           position: 'fixed',
           top: 0,
           left: '-9999px',
-          width: '560px',
+          width: '450px', // Perfect width matching popup modal visual boundaries
           zIndex: -1,
           pointerEvents: 'none',
-          fontFamily: "'Inter', 'Segoe UI', 'Roboto', 'Georgia', serif",
-          background: 'linear-gradient(160deg, #600000 0%, #300000 70%, #1a0000 100%)',
-          border: '4px solid #D4AF37',
-          borderRadius: '16px',
-          padding: '24px 24px 20px',
-          boxSizing: 'border-box',
-          color: '#FFFFFF',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.9)',
+          color: 'white',
         }}
       >
-        {/* Banner image replaces text header */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-          <img
-            src="/panchangam-banner.png"
-            alt="Sri Govindharaja Swamy Temple - Today's Panchangam"
-            crossOrigin="anonymous"
-            style={{ width: '100%', maxWidth: '512px', height: 'auto', objectFit: 'contain', borderRadius: '8px' }}
-          />
-        </div>
+        <div className="share-poster-preview" style={{ margin: 0, width: '100%' }}>
+          <div className="poster-inner">
 
-        {/* Date Headers */}
-        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-          <div style={{ fontSize: '15px', fontWeight: 800, color: '#FFAA55', marginBottom: '5px', letterSpacing: '0.5px' }}>
-            {isTe ? `తేదీ: ${live.gregorianDateString}` : `Date: ${live.gregorianDateString}`}
-          </div>
-          <div style={{ fontSize: '20px', fontWeight: 800, color: '#FFD700', letterSpacing: '0.5px' }}>
-            {isTe ? live.monthDayVaraHeaderTe : `${formattedDay} ${selectedDate.toLocaleString('en-IN', { month: 'long' })} ${formattedYear}`}
-          </div>
-          <div style={{ fontSize: '13px', color: '#E2C275', marginTop: '4px', fontStyle: 'italic', letterSpacing: '1px' }}>
-            {isTe ? live.sanskritVaraHeaderTe : live.sanskritVaraHeaderEn}
-          </div>
-          <div style={{ fontSize: '11px', color: '#FFFFFF', opacity: 0.85, marginTop: '5px', letterSpacing: '0.3px', background: 'rgba(255,255,255,0.06)', display: 'inline-block', padding: '3px 10px', borderRadius: '20px' }}>
-            {isTe ? live.samvatsaraNameTe : `Sri ${live.samvatsaraName} Samvatsara`} | {isTe ? live.masaNameTe : `${live.masa} Masa`}
-          </div>
-        </div>
+            {/* Decorative corners */}
+            <div className="poster-corner top-left"></div>
+            <div className="poster-corner top-right"></div>
+            <div className="poster-corner bottom-left"></div>
+            <div className="poster-corner bottom-right"></div>
 
-        <div style={{ height: '1px', background: 'rgba(212, 175, 55, 0.4)', marginBottom: '14px' }} />
+            <div className="poster-logo-container">
+              <img
+                src="/panchangam-banner.png"
+                alt="Sri Govindharaja Swamy Temple - Today's Panchangam"
+                className="poster-banner-img"
+                crossOrigin="anonymous"
+              />
+            </div>
 
-        {/* Main Content: Double Column Layout like the provided reference image! */}
-        <div style={{ display: 'flex', gap: '16px', marginBottom: '14px' }}>
-          
-          {/* Left Column: Core Limbs */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.15)', padding: '10px 12px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, color: '#E2C275', textTransform: 'uppercase', marginBottom: '2px' }}>
-                {isTe ? 'తిథి' : t('label_tithi')}
+            <div className="poster-divider"></div>
+
+            {/* Poster Header */}
+            <div className="poster-date">
+              <span className="p-date-gregorian" style={{ fontSize: '14px', fontWeight: '800', color: '#FFD700', display: 'block', marginBottom: '5px' }}>
+                {isTe ? `తేదీ: ${live.gregorianDateString}` : `Date: ${live.gregorianDateString}`}
+              </span>
+              <span className="p-date-main">
+                {isTe ? live.monthDayVaraHeaderTe : `${formattedDay} ${selectedDate.toLocaleString(sectionLocale, { month: 'long' })} ${formattedYear}`}
+              </span>
+              <span className="p-date-sanskrit">
+                {isTe ? live.sanskritVaraHeaderTe : live.sanskritVaraHeaderEn}
+              </span>
+              <span className="p-date-sub">
+                {isTe ? live.samvatsaraNameTe : `Sri ${live.samvatsaraName} Samvatsara`} | {isTe ? live.masaNameTe : `${live.masa} Masa`}
+              </span>
+            </div>
+
+            {/* Poster Data Rows (Matching the exact list of values) */}
+            <div className="poster-data-grid">
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'తిథి' : t('label_tithi')}</span>
+                <span className="p-value">{isTe ? live.tithiTe : live.tithi}</span>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
-                {live.tithiTe}
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'నక్షత్రం' : t('label_nakshatram')}</span>
+                <span className="p-value">{isTe ? live.nakshatraTe : live.nakshatra}</span>
+              </div>
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'యోగం' : t('label_yogam')}</span>
+                <span className="p-value">{isTe ? live.yogaTe : live.yoga}</span>
+              </div>
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'కరణం' : t('label_karanam')}</span>
+                <span className="p-value">{isTe ? live.karanaTe : live.karana}</span>
+              </div>
+
+              <div className="poster-timings-divider">⚡ {isTe ? 'శుభ & అశుభ సమయాలు' : t('label_poster_divider')}</div>
+
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'శుభ సమయాలు' : t('label_auspicious')}</span>
+                <span className="p-value timing-val-good">{isTe ? live.auspiciousTimingsTe : live.auspiciousTimings}</span>
+              </div>
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'రాహుకాలం' : t('label_rahu_kalam')}</span>
+                <span className="p-value timing-val-bad">{isTe ? live.rahuKalamTe : live.rahuKalam}</span>
+              </div>
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'దుర్ముహూర్తం' : t('label_durmuhurtham')}</span>
+                <span className="p-value timing-val-bad">{isTe ? live.durmuhurthamTe : live.durmuhurtham}</span>
+              </div>
+              <div className="poster-data-row">
+                <span className="p-label">{isTe ? 'సూర్యోదయం / సూర్యాస్తమయం' : `${t('label_sunrise')} / ${t('label_sunset')}`}</span>
+                <span className="p-value">
+                  {isTe ? `${live.sunriseTe} / ${live.sunsetTe}` : `${live.sunrise} / ${live.sunset}`}
+                </span>
               </div>
             </div>
 
-            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.15)', padding: '10px 12px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, color: '#E2C275', textTransform: 'uppercase', marginBottom: '2px' }}>
-                {isTe ? 'నక్షత్రం' : t('label_nakshatram')}
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
-                {live.nakshatraTe}
-              </div>
+            <div className="poster-footer">
+              🛕 {isTe ? 'శ్రీ గోవిందరాజస్వామి దేవస్థానం, జగద్గిరిగుట్ట, హైదరాబాద్' : 'SRI GOVINDHA RAJA SWAMY DEVASTHANAM, Jagadgiri Gutta, Hyderabad'}
             </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.15)', padding: '10px 12px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, color: '#E2C275', textTransform: 'uppercase', marginBottom: '2px' }}>
-                {isTe ? 'యోగం' : t('label_yogam')}
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
-                {live.yogaTe}
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.15)', padding: '10px 12px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 700, color: '#E2C275', textTransform: 'uppercase', marginBottom: '2px' }}>
-                {isTe ? 'కరణం' : t('label_karanam')}
-              </div>
-              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF' }}>
-                {live.karanaTe}
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Timings & Festival */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            
-            {/* Festival Spotlight */}
-            <div style={{ background: 'rgba(255,153,51,0.08)', borderRadius: '8px', border: '1px solid rgba(255,153,51,0.3)', padding: '10px 12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <div style={{ fontSize: '20px' }}>🔔</div>
-              <div>
-                <div style={{ fontSize: '8px', fontWeight: 700, color: '#FFAA88', textTransform: 'uppercase' }}>
-                  {isTe ? 'నేటి పండుగ / విశేషం' : t('label_today_festival')}
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 800, color: '#FFD700', marginTop: '2px' }}>
-                  {getFestivalName()}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.15)', padding: '8px 12px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 700, color: '#90FF90', textTransform: 'uppercase', marginBottom: '2px' }}>
-                {isTe ? 'శుభ సమయాలు' : t('label_auspicious')}
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF' }}>
-                {isTe ? live.auspiciousTimingsTe : live.auspiciousTimings}
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.15)', padding: '8px 12px' }}>
-              <div style={{ fontSize: '9px', fontWeight: 700, color: '#FFAA88', textTransform: 'uppercase', marginBottom: '2px' }}>
-                {isTe ? 'శ్రద్ధ తిథి' : t('label_shraddha_tithi')}
-              </div>
-              <div style={{ fontSize: '11px', fontWeight: 700, color: '#FFFFFF' }}>
-                {isTe ? live.shraddhaTithiTe : live.shraddhaTithi}
-              </div>
-            </div>
-
-            <div style={{ background: 'rgba(255,80,50,0.06)', borderRadius: '8px', border: '1px solid rgba(255,80,50,0.2)', padding: '8px 12px', display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ fontSize: '8px', fontWeight: 700, color: '#FFAAAA', textTransform: 'uppercase' }}>
-                  {isTe ? 'రాహుకాలం' : t('label_rahu_kalam')}
-                </div>
-                <div style={{ fontSize: '10px', fontWeight: 700, color: '#FFAAAA', marginTop: '2px' }}>
-                  {isTe ? live.rahuKalamTe : live.rahuKalam}
-                </div>
-              </div>
-              <div>
-                <div style={{ fontSize: '8px', fontWeight: 700, color: '#FFAAAA', textTransform: 'uppercase' }}>
-                  {isTe ? 'దుర్ముహూర్తం' : t('label_durmuhurtham')}
-                </div>
-                <div style={{ fontSize: '10px', fontWeight: 700, color: '#FFAAAA', marginTop: '2px' }}>
-                  {isTe ? live.durmuhurthamTe : live.durmuhurtham}
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Sunrise/Sunset and Moonrise/Moonset row */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', textAlign: 'center' }}>
-            <div style={{ fontSize: '8px', color: '#E2C275', textTransform: 'uppercase' }}>{isTe ? 'సూర్యోదయం' : t('label_sunrise')}</div>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFD700', marginTop: '2px' }}>{isTe ? live.sunriseTe : live.sunrise}</div>
-          </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', textAlign: 'center' }}>
-            <div style={{ fontSize: '8px', color: '#E2C275', textTransform: 'uppercase' }}>{isTe ? 'సూర్యాస్తమయం' : t('label_sunset')}</div>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFD700', marginTop: '2px' }}>{isTe ? live.sunsetTe : live.sunset}</div>
-          </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', textAlign: 'center' }}>
-            <div style={{ fontSize: '8px', color: '#E2C275', textTransform: 'uppercase' }}>{isTe ? 'చంద్రోదయం' : t('label_moonrise')}</div>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFD700', marginTop: '2px' }}>{isTe ? live.moonriseTe : live.moonrise}</div>
-          </div>
-          <div style={{ flex: 1, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', padding: '6px', textAlign: 'center' }}>
-            <div style={{ fontSize: '8px', color: '#E2C275', textTransform: 'uppercase' }}>{isTe ? 'చంద్రాస్తమయం' : t('label_moonset')}</div>
-            <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFD700', marginTop: '2px' }}>{isTe ? live.moonsetTe : live.moonset}</div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div style={{ borderTop: '1px solid rgba(212, 175, 55, 0.4)', paddingTop: '10px', textAlign: 'center' }}>
-          <div style={{ fontSize: '10px', fontWeight: 700, color: '#D4AF37', letterSpacing: '0.5px' }}>
-            {isTe ? 'శ్రీ గోవిందరాజస్వామి దేవస్థానం, జగద్గిరిగుట్ట, హైదరాబాద్' : 'SRI GOVINDHA RAJA SWAMY DEVASTHANAM, Jagadgiri Gutta, Hyderabad'}
-          </div>
-          <div style={{ fontSize: '8px', color: '#E2C275', opacity: 0.8, marginTop: '2px' }}>
-            {isTe ? 'భక్తి • సమృద్ధి • శాంతి' : t('label_poster_subfooter')}
           </div>
         </div>
       </div>

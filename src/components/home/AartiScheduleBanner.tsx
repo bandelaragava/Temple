@@ -12,35 +12,35 @@ const DiyaIcon = () => (
 
 // Corner Ornament SVG for the corners of the banner
 const CornerOrnament = ({ style }: { style?: React.CSSProperties }) => (
-  <svg 
-    viewBox="0 0 100 100" 
-    fill="none" 
+  <svg
+    viewBox="0 0 100 100"
+    fill="none"
     xmlns="http://www.w3.org/2000/svg"
     style={{ width: '40px', height: '40px', position: 'absolute', pointerEvents: 'none', zIndex: 5, ...style }}
   >
-    <path 
-      d="M 6 6 L 90 6 M 6 6 L 6 90" 
-      stroke="#D4AF37" 
-      strokeWidth="3.5" 
-      strokeLinecap="round" 
+    <path
+      d="M 6 6 L 90 6 M 6 6 L 6 90"
+      stroke="#D4AF37"
+      strokeWidth="3.5"
+      strokeLinecap="round"
     />
-    <path 
-      d="M 12 12 L 50 12 M 12 12 L 12 50" 
-      stroke="#D4AF37" 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
+    <path
+      d="M 12 12 L 50 12 M 12 12 L 12 50"
+      stroke="#D4AF37"
+      strokeWidth="1.5"
+      strokeLinecap="round"
     />
-    <path 
-      d="M 6 6 C 25 25, 30 45, 12 45 C 12 45, 35 35, 45 12 C 45 12, 25 25, 25 6" 
-      stroke="#D4AF37" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
+    <path
+      d="M 6 6 C 25 25, 30 45, 12 45 C 12 45, 35 35, 45 12 C 45 12, 25 25, 25 6"
+      stroke="#D4AF37"
+      strokeWidth="2"
+      strokeLinecap="round"
       strokeLinejoin="round"
     />
-    <path 
-      d="M 6 25 C 16 25, 25 16, 25 6" 
-      stroke="#D4AF37" 
-      strokeWidth="2" 
+    <path
+      d="M 6 25 C 16 25, 25 16, 25 6"
+      stroke="#D4AF37"
+      strokeWidth="2"
     />
     <circle cx="12" cy="12" r="3" fill="#D4AF37" />
   </svg>
@@ -158,7 +158,7 @@ const AartiScheduleBanner = () => {
           ))}
 
           {/* Interactive Reminder Action */}
-          <button 
+          <button
             className={`schedule-reminder-btn ${isReminderSet ? 'active' : ''}`}
             onClick={() => setIsReminderSet(!isReminderSet)}
           >
