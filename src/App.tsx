@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Booking from './pages/Booking';
 import About from './pages/About';
 import Darshan from './pages/Darshan';
+import PoojaDetails from './pages/PoojaDetails';
 import Donate from './pages/Donate';
 import Gallery from './pages/Gallery';
 import Festivals from './pages/Festivals';
@@ -88,6 +89,7 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/booking" element={<Booking />} />
+          <Route path="/pooja/:id" element={<PoojaDetails />} />
           <Route path="/about" element={<About />} />
           <Route path="/darshan" element={<Darshan />} />
           <Route path="/donate" element={<Donate />} />

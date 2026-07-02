@@ -224,11 +224,11 @@ const Navbar = () => {
       line2: "Darshan"
     },
     {
-      name: "Sevas & Pujas",
-      path: "/booking",
-      icon: <DiyaIcon size={24} />,
-      line1: "Sevas &",
-      line2: "Pujas"
+      name: "Upcoming Festivals",
+      path: "/festivals",
+      icon: <Sparkles size={24} />,
+      line1: "Upcoming",
+      line2: "Festivals"
     },
     {
       name: "Devotion E-Hundi",
@@ -240,7 +240,6 @@ const Navbar = () => {
   ];
 
   const secondaryLinks = [
-    { name: "Upcoming Festivals", path: "/festivals", icon: <Sparkles size={18} /> },
     { name: "Photo Gallery", path: "/gallery", icon: <Image size={18} /> },
     {
       name: "Watch Live Aarti",

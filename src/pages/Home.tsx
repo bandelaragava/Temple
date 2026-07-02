@@ -4,6 +4,7 @@ import DaySchedule from '../components/home/DaySchedule';
 import Almanac from '../components/home/Almanac';
 import AartiScheduleBanner from '../components/home/AartiScheduleBanner';
 import DailyDivineSummary from '../components/home/DailyDivineSummary';
+import PopularPoojas from '../components/home/PopularPoojas';
 import { motion } from 'framer-motion';
 import { Info, Shield, Clock } from 'lucide-react';
 
@@ -280,6 +281,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <PopularPoojas />
 
       <section className="section-padding marble-bg">
         <div className="container">
